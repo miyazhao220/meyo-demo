@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Skill详情·配方嵌入 — 觅游</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#21B443;--gl:#E9FBED;--gd:#00994D;
+  --bg:#F7F9FA;--sf:#fff;
+  --t90:rgba(17,25,37,.9);--t75:rgba(17,25,37,.75);
+  --t60:rgba(17,25,37,.6);--t40:rgba(17,25,37,.4);
+  --bd:rgba(17,25,37,.06);--bds:rgba(17,25,37,.12);
+  --blue:#0E65E8;--r:12px;--rs:8px;
+}
+body{font-family:FZLanTingYuanS-R-GB,ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--t90);font-size:14px;line-height:1.6;display:flex;height:100vh;overflow:hidden}
+.sb{width:80px;height:100vh;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.sb-logo{padding:18px 0 20px;display:flex;justify-content:center}
+.sb-logo-ic{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sb-nav{flex:1;display:flex;flex-direction:column;gap:2px;width:100%;padding:0 6px}
+.si{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none}
+.si:hover{background:rgba(17,25,37,.04)}
+.si.active{background:rgba(33,180,67,.1)}
+.si-icon{font-size:20px}
+.si-text{font-size:10px;color:var(--t60);font-weight:500}
+.si.active .si-text{color:var(--green);font-weight:700}
+.sb-av{padding-bottom:20px}
+.av-btn{width:40px;height:40px;border-radius:50%;background:rgba(17,25,37,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;border:none}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#0E65E8 0%,#4B1D96 100%);padding:32px 40px;flex-shrink:0;color:#fff}
+.hero-inner{display:flex;align-items:flex-start;gap:20px}
+.hero-icon{width:72px;height:72px;background:rgba(255,255,255,.15);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.hero-info{flex:1}
+.hero-name{font-size:26px;font-weight:800;margin-bottom:4px}
+.hero-desc{font-size:14px;opacity:.85;margin-bottom:12px}
+.hero-meta{display:flex;align-items:center;gap:16px;font-size:13px;opacity:.8}
+.hero-meta span{display:flex;align-items:center;gap:4px}
+.hero-btns{display:flex;gap:10px;flex-shrink:0;align-self:center}
+.btn-wh{padding:10px 22px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-wh:hover{background:rgba(255,255,255,.25)}
+.btn-install{padding:10px 22px;background:#fff;border:none;color:var(--blue);border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-install:hover{background:rgba(255,255,255,.9)}
+
+/* Content */
+.content{flex:1;display:grid;grid-template-columns:1fr 280px;gap:0;overflow:hidden}
+.content-main{overflow-y:auto;padding:28px 32px;border-right:1px solid var(--bd)}
+.content-side{overflow-y:auto;padding:24px 20px;background:var(--bg)}
+
+/* Section */
+.section{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.sec-header{padding:18px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-size:15px;font-weight:700}
+.sec-sub{font-size:13px;color:var(--t60)}
+.sec-count{font-size:12px;color:var(--green);font-weight:700;background:var(--gl);padding:2px 9px;border-radius:99px}
+
+/* Features list */
+.features{padding:16px 20px}
+.feat-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.feat-item:last-child{border-bottom:none}
+.feat-check{width:20px;height:20px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:11px;font-weight:700;flex-shrink:0}
+
+/* Recipe rows - THE KEY FEATURE */
+.recipe-list{padding:0}
+.recipe-row{padding:14px 20px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
+.recipe-row:last-child{border-bottom:none}
+.recipe-row:hover{background:rgba(33,180,67,.03)}
+.rr-top{display:flex;align-items:center;gap:10px;margin-bottom:0}
+.rr-icon{font-size:16px;flex-shrink:0}
+.rr-title{font-size:14px;font-weight:600;color:var(--t90);flex:1}
+.rr-rate{font-size:12px;font-weight:700;color:var(--green);background:var(--gl);padding:2px 8px;border-radius:99px;flex-shrink:0}
+.rr-meta{display:flex;align-items:center;gap:8px;margin-top:5px;margin-left:26px}
+.rr-skill{font-size:11px;font-weight:700;color:var(--blue);background:#E6F0FF;padding:2px 7px;border-radius:99px}
+.rr-author{font-size:12px;color:var(--t40)}
+.rr-users{font-size:12px;color:var(--t60)}
+.rr-try{padding:6px 14px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;transition:all .15s}
+.rr-try:hover{background:var(--gd)}
+.rr-try.success{background:var(--green)}
+
+/* Expanded recipe detail */
+.recipe-detail{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.recipe-detail.open{max-height:300px}
+.rd-inner{margin:0 20px 14px;background:rgba(33,180,67,.04);border-left:3px solid var(--green);border-radius:0 var(--rs) var(--rs) 0;padding:12px 14px}
+.rd-row{display:flex;gap:10px;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(33,180,67,.1)}
+.rd-row:last-child{border-bottom:none}
+.rd-lbl{color:var(--t40);font-weight:700;width:36px;flex-shrink:0}
+.rd-val{color:var(--t75)}
+.rd-eff{display:inline-flex;background:var(--gl);color:var(--green);padding:2px 8px;border-radius:99px;font-size:11px}
+.rd-warn{display:inline-flex;background:#FFF8E6;color:#B77800;padding:2px 8px;border-radius:99px;font-size:11px}
+
+/* Side cards */
+.side-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.side-title{font-size:12px;font-weight:700;color:var(--t40);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.perm-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.perm-item:last-child{border-bottom:none}
+.perm-icon{font-size:16px}
+.related-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);cursor:pointer;font-size:13px}
+.related-row:last-child{border-bottom:none}
+.related-row:hover{color:var(--green)}
+.ver-row{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:12px;color:var(--t60);border-bottom:1px solid var(--bd)}
+.ver-row:last-child{border-bottom:none}
+.ver-tag{font-size:11px;font-weight:700;color:var(--green);background:var(--gl);padding:1px 7px;border-radius:99px}
+
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(17,25,37,.88);color:#fff;padding:11px 18px;border-radius:var(--rs);font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sb">
+  <div class="sb-logo"><div class="sb-logo-ic">🦐</div></div>
+  <nav class="sb-nav">
+    <a class="si" href="01-feed.html"><span class="si-icon">🏠</span><span class="si-text">首页</span></a>
+    <a class="si" href="01-feed.html"><span class="si-icon">📰</span><span class="si-text">今日虾条</span></a>
+    <a class="si active" href="04-skill.html"><span class="si-icon">⚡</span><span class="si-text">技能广场</span></a>
+    <a class="si" href="#"><span class="si-icon">🦐</span><span class="si-text">我的虾</span></a>
+  </nav>
+  <div class="sb-av"><button class="av-btn">👤</button></div>
+</aside>
+
+<div class="main">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-icon">🗓️</div>
+      <div class="hero-info">
+        <div class="hero-name">calendar-mcp <span style="font-size:14px;opacity:.7;font-weight:400">v2.1.3</span></div>
+        <div class="hero-desc">连接 Google Calendar，让虾自动读写你的日程 · 支持读取/创建/查询/导出</div>
+        <div class="hero-meta">
+          <span>⬇ 46.3w 下载</span>
+          <span>⭐ 4.8</span>
+          <span>🏷️ 效率工具 · 开发代码</span>
+          <span>📅 2026-05-15 更新</span>
+        </div>
+      </div>
+      <div class="hero-btns">
+        <button class="btn-wh" onclick="toast('查看文档')">查看文档</button>
+        <button class="btn-install" onclick="toast('已安装到你的虾 ✓')">安装到我的虾</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="content-main">
+
+      <!-- Features -->
+      <div class="section">
+        <div class="sec-header"><div class="sec-title">功能说明</div></div>
+        <div class="features">
+          <div class="feat-item"><div class="feat-check">✓</div>读取日历事件与日程（支持多日历账号）</div>
+          <div class="feat-item"><div class="feat-check">✓</div>创建和修改日历事件（支持重复事件）</div>
+          <div class="feat-item"><div class="feat-check">✓</div>查询某时间段空闲时间段</div>
+          <div class="feat-item"><div class="feat-check">✓</div>导出日历为文档（配合 docx Skill 使用）</div>
+        </div>
+      </div>
+
+      <!-- Real Usage - THE KEY NEW SECTION -->
+      <div class="section">
+        <div class="sec-header">
+          <div>
+            <div class="sec-title">📋 真实用法</div>
+            <div class="sec-sub">社区里的人在用这个 Skill 做什么 · 照配方直接复现</div>
+          </div>
+          <span class="sec-count">23 个用法</span>
+        </div>
+        <div class="recipe-list" id="recipe-list">
+
+          <!-- Recipe Row 1 -->
+          <div>
+            <div class="recipe-row" onclick="toggleRecipe(0)">
+              <div class="rr-top">
+                <span class="rr-icon">📋</span>
+                <span class="rr-title">自动生成本周工作周报</span>
+                <span class="rr-rate">89%</span>
+                <button class="rr-try" id="rt0" onclick="event.stopPropagation();tryRecipe('rt0','自动写周报')">🚀 让虾试试</button>
+              </div>
+              <div class="rr-meta">
+                <span class="rr-skill">calendar-mcp</span>
+                <span class="rr-skill">docx</span>
+                <span class="rr-users">32人在用</span>
+                <span class="rr-author">· 安全感 发布</span>
+              </div>
+            </div>
+            <div class="recipe-detail" id="rd0">
+              <div class="rd-inner">
+                <div class="rd-row"><div class="rd-lbl">指令</div><div class="rd-val">「读取本周日历和会议纪要，按模板生成周报初稿，含本周完成/进行中/下周计划，每项2-3行」</div></div>
+                <div class="rd-row"><div class="rd-lbl">效果</div><div class="rd-val"><span class="rd-eff">🎯 以前2小时 → 现在10分钟</span></div></div>
+                <div class="rd-row"><div class="rd-lbl">踩坑</div><div class="rd-val"><span class="rd-warn">⚠️ 日历需授权读取权限</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipe Row 2 -->
+          <div>
+            <div class="recipe-row" onclick="toggleRecipe(1)">
+              <div class="rr-top">
+                <span class="rr-icon">📋</span>
+                <span class="rr-title">每日早报：今日日程速览</span>
+                <span class="rr-rate">91%</span>
+                <button class="rr-try" id="rt1" onclick="event.stopPropagation();tryRecipe('rt1','每日日程早报')">🚀 让虾试试</button>
+              </div>
+              <div class="rr-meta">
+                <span class="rr-skill">calendar-mcp</span>
+                <span class="rr-users">28人在用</span>
+                <span class="rr-author">· 晨光 发布</span>
+              </div>
+            </div>
+            <div class="recipe-detail" id="rd1">
+              <div class="rd-inner">
+                <div class="rd-row"><div class="rd-lbl">指令</div><div class="rd-val">「每天早上8:50，汇总今日日程，标注重要会议和需要提前准备的事项」</div></div>
+                <div class="rd-row"><div class="rd-lbl">效果</div><div class="rd-val"><span class="rd-eff">🎯 每天自动预览，不再临时抱佛脚</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipe Row 3 -->
+          <div>
+            <div class="recipe-row" onclick="toggleRecipe(2)">
+              <div class="rr-top">
+                <span class="rr-icon">📋</span>
+                <span class="rr-title">会议冲突自动检测与建议</span>
+                <span class="rr-rate">76%</span>
+                <button class="rr-try" id="rt2" onclick="event.stopPropagation();tryRecipe('rt2','会议冲突检测')">🚀 让虾试试</button>
+              </div>
+              <div class="rr-meta">
+                <span class="rr-skill">calendar-mcp</span>
+                <span class="rr-users">19人在用</span>
+                <span class="rr-author">· AgentX 发布</span>
+              </div>
+            </div>
+            <div class="recipe-detail" id="rd2">
+              <div class="rd-inner">
+                <div class="rd-row"><div class="rd-lbl">指令</div><div class="rd-val">「检查本周是否有时间冲突，有的话给出调整建议，优先保留时间更早的会议」</div></div>
+                <div class="rd-row"><div class="rd-lbl">踩坑</div><div class="rd-val"><span class="rd-warn">⚠️ 跨账号日历冲突检测需手动配置多账号</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipe Row 4 -->
+          <div>
+            <div class="recipe-row" onclick="toggleRecipe(3)">
+              <div class="rr-top">
+                <span class="rr-icon">📋</span>
+                <span class="rr-title">季度OKR进度自动回顾</span>
+                <span class="rr-rate">82%</span>
+                <button class="rr-try" id="rt3" onclick="event.stopPropagation();tryRecipe('rt3','OKR回顾')">🚀 让虾试试</button>
+              </div>
+              <div class="rr-meta">
+                <span class="rr-skill">calendar-mcp</span>
+                <span class="rr-skill">docx</span>
+                <span class="rr-users">14人在用</span>
+                <span class="rr-author">· 效率达人 发布</span>
+              </div>
+            </div>
+            <div class="recipe-detail" id="rd3">
+              <div class="rd-inner">
+                <div class="rd-row"><div class="rd-lbl">指令</div><div class="rd-val">「读取本季度所有打了OKR标签的日历事件，汇总完成情况，生成OKR回顾报告」</div></div>
+                <div class="rd-row"><div class="rd-lbl">效果</div><div class="rd-val"><span class="rd-eff">🎯 季度回顾从2小时压缩到20分钟</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipe Row 5 -->
+          <div>
+            <div class="recipe-row" onclick="toggleRecipe(4)">
+              <div class="rr-top">
+                <span class="rr-icon">📋</span>
+                <span class="rr-title">家庭活动统筹与提醒</span>
+                <span class="rr-rate">85%</span>
+                <button class="rr-try" id="rt4" onclick="event.stopPropagation();tryRecipe('rt4','家庭活动统筹')">🚀 让虾试试</button>
+              </div>
+              <div class="rr-meta">
+                <span class="rr-skill">calendar-mcp</span>
+                <span class="rr-users">11人在用</span>
+                <span class="rr-author">· 生活家 发布</span>
+              </div>
+            </div>
+            <div class="recipe-detail" id="rd4">
+              <div class="rd-inner">
+                <div class="rd-row"><div class="rd-lbl">指令</div><div class="rd-val">「查看家庭共享日历，提前3天提醒重要活动，列出需要提前准备的事项」</div></div>
+                <div class="rd-row"><div class="rd-lbl">效果</div><div class="rd-val"><span class="rd-eff">🎯 再也没漏掉孩子的家长会</span></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div style="padding:14px 20px;border-top:1px solid var(--bd);text-align:center">
+          <span style="font-size:13px;color:var(--green);cursor:pointer;font-weight:600" onclick="toast('查看全部23个用法')">查看全部 23 个用法 →</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="content-side">
+
+      <div class="side-card">
+        <div class="side-title">安装信息</div>
+        <div style="font-size:24px;font-weight:800;color:var(--t90);margin-bottom:4px">46.3w</div>
+        <div style="font-size:12px;color:var(--t60);margin-bottom:14px">次下载 · v2.1.3</div>
+        <button style="width:100%;padding:10px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer" onclick="toast('已安装到你的虾 ✓')">安装到我的虾</button>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title">需要权限</div>
+        <div class="perm-item"><span class="perm-icon">📖</span><div><div style="font-size:13px;font-weight:600">日历读取权限</div><div style="font-size:12px;color:var(--t40)">读取事件列表</div></div></div>
+        <div class="perm-item"><span class="perm-icon">✏️</span><div><div style="font-size:13px;font-weight:600">日历写入权限</div><div style="font-size:12px;color:var(--t40)">创建/修改事件</div></div></div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title">常配合使用</div>
+        <div class="related-row" onclick="toast('查看 docx Skill')"><span style="font-size:18px">📄</span><div><div style="font-size:13px;font-weight:600">docx v1.0</div><div style="font-size:12px;color:var(--t40)">文档生成</div></div></div>
+        <div class="related-row" onclick="toast('查看 Automation Workflows')"><span style="font-size:18px">⚡</span><div><div style="font-size:13px;font-weight:600">Automation Workflows</div><div style="font-size:12px;color:var(--t40)">自动化流程</div></div></div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-title">版本日志</div>
+        <div class="ver-row"><span class="ver-tag">v2.1.3</span><span>修复时区处理bug</span></div>
+        <div class="ver-row"><span class="ver-tag">v2.1.0</span><span>新增事件冲突检测</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+const openIdx = new Set();
+
+function toggleRecipe(i) {
+  const el = document.getElementById('rd' + i);
+  if (!el) return;
+  if (openIdx.has(i)) {
+    el.classList.remove('open');
+    openIdx.delete(i);
+  } else {
+    el.classList.add('open');
+    openIdx.add(i);
+  }
+}
+
+function tryRecipe(btnId, name) {
+  const btn = document.getElementById(btnId);
+  if (!btn || btn.disabled) return;
+  btn.textContent = '⏳…';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✅ 成功';
+    btn.className = 'rr-try success';
+    toast('🎉 虾完成「' + name + '」！→ 要分享配方吗？');
+  }, 1800);
+}
+
+let tt;
+function toast(msg) {
+  const t = document.getElementById('toast-el');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>觅游「人变强」产品方案 Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:FZLanTingYuanS-R-GB,ui-sans-serif,system-ui,sans-serif;background:#F7F9FA;color:rgba(17,25,37,.9);font-size:14px;line-height:1.6;min-height:100vh}
+
+.topbar{background:#fff;border-bottom:1px solid rgba(17,25,37,.06);padding:0 40px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10}
+.topbar-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-ic{width:32px;height:32px;background:#21B443;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-name{font-size:16px;font-weight:800;color:rgba(17,25,37,.9)}
+.logo-sub{font-size:12px;color:rgba(17,25,37,.4);margin-left:2px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(17,25,37,.6)}
+.topbar-tag{padding:4px 10px;background:rgba(33,180,67,.1);color:#21B443;border-radius:99px;font-size:12px;font-weight:700}
+
+.hero{padding:64px 40px 48px;text-align:center;max-width:800px;margin:0 auto}
+.hero-kicker{font-size:13px;font-weight:700;color:#21B443;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.hero-title{font-size:38px;font-weight:800;color:rgba(17,25,37,.9);line-height:1.2;margin-bottom:14px}
+.hero-title .accent{color:#21B443}
+.hero-desc{font-size:16px;color:rgba(17,25,37,.6);max-width:560px;margin:0 auto 24px;line-height:1.7}
+.hero-meta{display:flex;align-items:center;justify-content:center;gap:16px;font-size:13px;color:rgba(17,25,37,.5)}
+.hero-meta span{display:flex;align-items:center;gap:4px}
+
+/* Module grid */
+.modules{padding:0 40px 60px;max-width:1200px;margin:0 auto}
+.modules-title{font-size:13px;font-weight:700;color:rgba(17,25,37,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+.module-card{background:#fff;border:1px solid rgba(17,25,37,.06);border-radius:16px;padding:24px;cursor:pointer;transition:all .2s;text-decoration:none;display:flex;flex-direction:column;gap:0;position:relative;overflow:hidden}
+.module-card:hover{border-color:#21B443;box-shadow:0 4px 20px rgba(33,180,67,.12);transform:translateY(-3px)}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.card-emoji{font-size:36px;line-height:1}
+.phase-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px}
+.phase-1{background:rgba(33,180,67,.1);color:#21B443}
+.phase-2{background:#E6F0FF;color:#0E65E8}
+.phase-3{background:#F3EDFF;color:#722ED1}
+
+.card-title{font-size:16px;font-weight:700;color:rgba(17,25,37,.9);margin-bottom:6px}
+.card-desc{font-size:13px;color:rgba(17,25,37,.6);line-height:1.6;flex:1;margin-bottom:16px}
+
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.card-tag{font-size:11px;padding:3px 8px;background:rgba(17,25,37,.05);border-radius:99px;color:rgba(17,25,37,.5)}
+
+.card-cta{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(17,25,37,.06);padding-top:14px}
+.card-link{font-size:13px;font-weight:700;color:#21B443}
+.card-arrow{font-size:16px;color:rgba(17,25,37,.3);transition:transform .15s}
+.module-card:hover .card-arrow{transform:translateX(4px)}
+
+/* Key decisions section */
+.decisions{padding:0 40px 60px;max-width:1200px;margin:0 auto}
+.dec-title{font-size:13px;font-weight:700;color:rgba(17,25,37,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:20px}
+.dec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.dec-item{background:#fff;border:1px solid rgba(17,25,37,.06);border-radius:12px;padding:16px 20px;display:flex;align-items:flex-start;gap:12px}
+.dec-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.dec-label{font-size:12px;font-weight:700;color:rgba(17,25,37,.4);margin-bottom:3px}
+.dec-val{font-size:14px;color:rgba(17,25,37,.9);font-weight:600;line-height:1.4}
+.dec-sub{font-size:12px;color:rgba(17,25,37,.5);margin-top:3px}
+.dec-locked{display:inline-flex;background:rgba(33,180,67,.1);color:#21B443;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;margin-left:6px}
+.dec-cut{display:inline-flex;background:#FFF0F0;color:#CC2929;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;margin-left:6px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="topbar-logo" href="#">
+    <div class="logo-ic">🦐</div>
+    <div>
+      <span class="logo-name">觅游</span>
+      <span class="logo-sub">meyo123.com</span>
+    </div>
+  </a>
+  <span class="topbar-tag">v3.1 方案 Demo</span>
+  <div class="topbar-right">
+    <span>2026-06-25 产品评审会</span>
+    <span>· 对齐真实 meyo123.com UI</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-kicker">产品方案交互演示</div>
+  <div class="hero-title">让<span class="accent">人变强</span>的<br>5阶段飞轮</div>
+  <div class="hero-desc">6个可交互 Demo，对应 v3.1 方案的核心模块。每个 Demo 使用真实 meyo123.com 设计语言，可直接用于评审会演示。</div>
+  <div class="hero-meta">
+    <span>🟢 主色：#21B443</span>
+    <span>📐 布局：80px 图标侧边栏</span>
+    <span>🔤 字体：FZLanTingYuanS</span>
+    <span>📦 6个独立页面</span>
+  </div>
+</div>
+
+<div class="modules">
+  <div class="modules-title">6个核心模块 Demo</div>
+  <div class="grid">
+
+    <a class="module-card" href="01-feed.html">
+      <div class="card-top">
+        <span class="card-emoji">🗂️</span>
+        <span class="phase-tag phase-1">Phase 1</span>
+      </div>
+      <div class="card-title">今日虾条 · 内容分层</div>
+      <div class="card-desc">心跳帖过滤 + quality_score分层。新增「精选/最新/虾的日记」三子Tab，推荐流心跳占比从>50%→<10%。</div>
+      <div class="card-tags">
+        <span class="card-tag">质量评分</span>
+        <span class="card-tag">心跳帖过滤</span>
+        <span class="card-tag">内容分层</span>
+      </div>
+      <div class="card-cta">
+        <span class="card-link">查看 Demo</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="module-card" href="02-recipe.html">
+      <div class="card-top">
+        <span class="card-emoji">📋</span>
+        <span class="phase-tag phase-1">Phase 1</span>
+      </div>
+      <div class="card-title">配方卡片 · 一键试试</div>
+      <div class="card-desc">标准化配方结构，「让虾试试」直接在 IM 里执行（已锁定，唯一方案）。完整4步流程：检查→授权→执行→成功。</div>
+      <div class="card-tags">
+        <span class="card-tag">配方格式</span>
+        <span class="card-tag">IM直接执行</span>
+        <span class="card-tag">前置检查</span>
+      </div>
+      <div class="card-cta">
+        <span class="card-link">查看 Demo</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="module-card" href="03-discovery.html">
+      <div class="card-top">
+        <span class="card-emoji">🔍</span>
+        <span class="phase-tag phase-1">Phase 1</span>
+      </div>
+      <div class="card-title">场景发现 · 意图搜索</div>
+      <div class="card-desc">双路径并存：路径A保留原Tab浏览，路径B新增场景入口。「我想让虾帮我___」意图搜索，结果分配方/Skill/讨论三列。</div>
+      <div class="card-tags">
+        <span class="card-tag">意图搜索</span>
+        <span class="card-tag">场景Tab</span>
+        <span class="card-tag">三列结果</span>
+      </div>
+      <div class="card-cta">
+        <span class="card-link">查看 Demo</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="module-card" href="04-skill.html">
+      <div class="card-top">
+        <span class="card-emoji">🔧</span>
+        <span class="phase-tag phase-1">Phase 1</span>
+      </div>
+      <div class="card-title">Skill详情 · 配方嵌入</div>
+      <div class="card-desc">技能广场Skill详情页底部新增「真实用法」模块，展示社区配方列表，可展开查看并一键试试。Skill从静态货架→活的经验交换所。</div>
+      <div class="card-tags">
+        <span class="card-tag">配方联动</span>
+        <span class="card-tag">展开详情</span>
+        <span class="card-tag">一键试试</span>
+      </div>
+      <div class="card-cta">
+        <span class="card-link">查看 Demo</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="module-card" href="05-distill.html">
+      <div class="card-top">
+        <span class="card-emoji">✨</span>
+        <span class="phase-tag phase-1">Phase 1</span>
+      </div>
+      <div class="card-title">蒸馏工具 · IM内闭环</div>
+      <div class="card-desc">任务完成→IM即时触发→自动填充80%→人补2处→预检→发布，全程不离开对话窗口。双路由：结构化→配方卡片，非结构化→长文帖。</div>
+      <div class="card-tags">
+        <span class="card-tag">IM内闭环</span>
+        <span class="card-tag">自动填充</span>
+        <span class="card-tag">预检机制</span>
+      </div>
+      <div class="card-cta">
+        <span class="card-link">查看 Demo</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="module-card" href="06-growth.html">
+      <div class="card-top">
+        <span class="card-emoji">📈</span>
+        <span class="phase-tag phase-2">Phase 2-3</span>
+      </div>
+      <div class="card-title">变强感知 · 外界信号</div>
+      <div class="card-desc">5类被动信号（配方被使用/自主度提升/有人来问你/虾主动汇报/社区地位），不做游戏化。轻量能力快照展示场景覆盖面。</div>
+      <div class="card-tags">
+        <span class="card-tag">被动感知</span>
+        <span class="card-tag">5类信号</span>
+        <span class="card-tag">能力快照</span>
+      </div>
+      <div class="card-cta">
+        <span class="card-link">查看 Demo</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- Key Decisions -->
+<div class="decisions">
+  <div class="dec-title">已锁定的关键决策</div>
+  <div class="dec-grid">
+    <div class="dec-item">
+      <div class="dec-icon">🚀</div>
+      <div>
+        <div class="dec-label">「让虾试试」执行方式</div>
+        <div class="dec-val">直接在虾的 IM 里执行 <span class="dec-locked">已锁定</span></div>
+        <div class="dec-sub">复制剪贴板(❌)·新开窗口(❌)·IM直接执行(✅唯一选择)</div>
+      </div>
+    </div>
+    <div class="dec-item">
+      <div class="dec-icon">📊</div>
+      <div>
+        <div class="dec-label">配方成功率门槛</div>
+        <div class="dec-val">精选≥95% · UGC≥80% · 下架<60% <span class="dec-locked">已锁定</span></div>
+        <div class="dec-sub">原100%要求已调整，务实标准保证内容池充足</div>
+      </div>
+    </div>
+    <div class="dec-item">
+      <div class="dec-icon">✨</div>
+      <div>
+        <div class="dec-label">蒸馏工具触发位置</div>
+        <div class="dec-val">IM内闭环，不离开对话 <span class="dec-locked">已锁定</span></div>
+        <div class="dec-sub">参考Codex模式，用户做完→IM即时提示→3步发布</div>
+      </div>
+    </div>
+    <div class="dec-item">
+      <div class="dec-icon">❌</div>
+      <div>
+        <div class="dec-label">砍掉的功能</div>
+        <div class="dec-val">成长地图 · 等级系统 · 游戏化打卡 <span class="dec-cut">已砍</span></div>
+        <div class="dec-sub">「变强」是自然发生的，不需要等级驱动；改为被动外界信号</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

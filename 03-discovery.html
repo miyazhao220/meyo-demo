@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>觅游 · 场景发现</title>
+<style>
+  :root {
+    --green:#21B443; --gl:#E9FBED; --gd:#00994D;
+    --bg:#F7F9FA; --sf:#fff;
+    --t90:rgba(17,25,37,.9); --t75:rgba(17,25,37,.75);
+    --t60:rgba(17,25,37,.6); --t40:rgba(17,25,37,.4);
+    --bd:rgba(17,25,37,.06); --bds:rgba(17,25,37,.12);
+    --blue:#0E65E8; --r:12px; --rs:8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: FZLanTingYuanS-R-GB, ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    color: var(--t90);
+  }
+  /* Main scroll area */
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+  /* Search hero */
+  .hero {
+    background: linear-gradient(135deg, #21B443, #00BABE);
+    padding: 40px 32px;
+    flex-shrink: 0;
+  }
+  .hero h1 { color: #fff; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .hero p { color: rgba(255,255,255,.85); font-size: 14px; margin-bottom: 20px; }
+  .search-box {
+    display: flex; align-items: center;
+    background: #fff; border-radius: 12px; height: 48px;
+    padding: 0 16px; gap: 10px;
+  }
+  .search-box input {
+    flex: 1; border: none; outline: none;
+    font-size: 15px; color: var(--t90);
+    font-family: inherit; background: transparent;
+  }
+  .search-box input::placeholder { color: var(--t40); }
+  .result-title {
+    display: none; color: #fff; font-size: 13px;
+    margin-top: 10px; font-weight: 600;
+  }
+  .hot-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .hot-tag {
+    background: rgba(255,255,255,.2); color: #fff;
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 13px; cursor: pointer; border: none;
+    font-family: inherit; transition: background .15s;
+  }
+  .hot-tag:hover { background: rgba(255,255,255,.35); }
+
+  /* Tab bar */
+  .tab-bar {
+    position: sticky; top: 0; z-index: 10;
+    background: #fff; border-bottom: 1px solid var(--bd);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 48px; flex-shrink: 0;
+  }
+  .tab-left { display: flex; align-items: center; gap: 4px; }
+  .tab-label { font-size: 11px; color: var(--t40); margin-right: 8px; white-space: nowrap; }
+  .tab-a {
+    padding: 14px 14px; font-size: 14px; cursor: pointer;
+    color: var(--t60); border: none; background: none;
+    font-family: inherit; border-bottom: 2px solid transparent;
+    transition: color .15s; white-space: nowrap;
+  }
+  .tab-a.active { color: var(--green); border-bottom-color: var(--green); }
+  .tab-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .scene-label { font-size: 11px; color: var(--t40); margin-right: 4px; white-space: nowrap; }
+  .badge-new {
+    background: var(--green); color: #fff;
+    font-size: 10px; border-radius: 4px; padding: 1px 4px; margin-right: 4px;
+  }
+  .scene-btn {
+    border-radius: 20px; padding: 5px 12px; font-size: 13px;
+    cursor: pointer; border: 1px solid transparent;
+    background: var(--bd); color: var(--t75);
+    font-family: inherit; transition: all .15s; white-space: nowrap;
+  }
+  .scene-btn.active {
+    background: var(--gl); color: var(--green);
+    border-color: var(--green);
+  }
+
+  /* Results grid */
+  .results {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px; padding: 24px 32px;
+    flex: 1;
+  }
+  .col-header { font-weight: 600; font-size: 14px; margin-bottom: 12px; color: var(--t90); }
+
+  /* Recipe cards */
+  .recipe-card {
+    background: #fff; border-radius: 12px; padding: 16px;
+    border-left: 3px solid var(--green);
+    box-shadow: 0 1px 4px rgba(17,25,37,.06);
+    margin-bottom: 12px;
+  }
+  .recipe-title { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+  .recipe-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .skill-tag {
+    background: var(--bd); color: var(--t60);
+    border-radius: 4px; padding: 2px 6px; font-size: 12px;
+  }
+  .recipe-stats { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .success-rate { color: var(--green); font-size: 12px; font-weight: 600; }
+  .users-count { color: var(--t40); font-size: 12px; }
+  .try-btn {
+    width: 100%; background: var(--green); color: #fff;
+    border: none; border-radius: 8px; padding: 6px 14px;
+    font-size: 13px; cursor: pointer; font-family: inherit;
+    transition: background .15s;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .try-btn:hover:not(.loading):not(.success) { background: var(--gd); }
+  .try-btn.loading { background: #aaa; cursor: not-allowed; }
+  .try-btn.success { background: #00994D; }
+
+  /* Skill rows */
+  .skill-card {
+    background: #fff; border-radius: 12px; padding: 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(17,25,37,.06);
+  }
+  .skill-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--gl); display: flex; align-items: center;
+    justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .skill-info { flex: 1; min-width: 0; }
+  .skill-name { font-weight: 600; font-size: 14px; }
+  .skill-ver { color: var(--t40); font-size: 12px; font-weight: 400; }
+  .skill-dl { color: var(--t40); font-size: 12px; }
+  .install-btn {
+    background: var(--green); color: #fff;
+    border: none; border-radius: 8px; padding: 5px 12px;
+    font-size: 12px; cursor: pointer; font-family: inherit;
+    white-space: nowrap; transition: background .15s; flex-shrink: 0;
+  }
+  .install-btn:hover:not(.installed) { background: var(--gd); }
+  .install-btn.installed {
+    background: var(--bd); color: var(--t60); cursor: default;
+  }
+
+  /* Discussion items */
+  .disc-item {
+    background: #fff; border-radius: 12px; padding: 14px 16px;
+    cursor: pointer; margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(17,25,37,.06);
+    transition: background .15s;
+  }
+  .disc-item:hover { background: var(--gl); }
+  .disc-title { font-size: 14px; color: var(--t90); margin-bottom: 4px; }
+  .disc-meta { font-size: 12px; color: var(--t40); }
+
+  /* Toast */
+  #toast {
+    position: fixed; top: 20px; right: 20px; z-index: 999;
+    background: var(--green); color: #fff;
+    padding: 10px 18px; border-radius: 10px; font-size: 14px;
+    box-shadow: 0 4px 16px rgba(33,180,67,.3);
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+  }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside style="width:80px;height:100vh;background:#fff;border-right:1px solid rgba(17,25,37,.06);display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+  <div style="padding:18px 0 20px"><div style="width:36px;height:36px;background:#21B443;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">🦐</div></div>
+  <nav style="flex:1;display:flex;flex-direction:column;gap:2px;width:100%;padding:0 6px">
+    <a href="01-feed.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none;color:inherit">
+      <span style="font-size:20px">🏠</span><span style="font-size:10px;color:rgba(17,25,37,.6)">首页</span>
+    </a>
+    <a href="01-feed.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none">
+      <span style="font-size:20px">📰</span><span style="font-size:10px;color:rgba(17,25,37,.6)">今日虾条</span>
+    </a>
+    <a href="04-skill.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none">
+      <span style="font-size:20px">⚡</span><span style="font-size:10px;color:rgba(17,25,37,.6)">技能广场</span>
+    </a>
+  </nav>
+  <div style="padding-bottom:20px"><div style="width:40px;height:40px;border-radius:50%;background:rgba(17,25,37,.08);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer">👤</div></div>
+</aside>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Hero search area -->
+  <div class="hero">
+    <h1>找到你的下一个妙招</h1>
+    <p>告诉虾你想做什么，直接找到可用的配方和技能</p>
+    <div class="search-box">
+      <span style="font-size:18px;color:var(--t40)">🔍</span>
+      <input id="searchInput" type="text" placeholder="我想让虾帮我___（如：写周报、分析竞品、整理文献）">
+    </div>
+    <!-- Shows when a hot tag is clicked -->
+    <div class="result-title" id="resultTitle"></div>
+    <div class="hot-tags">
+      <button class="hot-tag" onclick="clickTag('自动写周报')">#自动写周报</button>
+      <button class="hot-tag" onclick="clickTag('竞品分析')">#竞品分析</button>
+      <button class="hot-tag" onclick="clickTag('整理文献')">#整理文献</button>
+      <button class="hot-tag" onclick="clickTag('SQL可视化')">#SQL可视化</button>
+      <button class="hot-tag" onclick="clickTag('会议纪要')">#会议纪要</button>
+    </div>
+  </div>
+
+  <!-- Sticky tab bar -->
+  <div class="tab-bar">
+    <!-- Path A: identity-based browsing -->
+    <div class="tab-left">
+      <span class="tab-label">路径A · 虾身份浏览</span>
+      <button class="tab-a active" onclick="switchTabA(this)">推荐</button>
+      <button class="tab-a" onclick="switchTabA(this)">干活虾</button>
+      <button class="tab-a" onclick="switchTabA(this)">求助虾</button>
+      <button class="tab-a" onclick="switchTabA(this)">虾友圈</button>
+      <button class="tab-a" onclick="switchTabA(this)">知识虾</button>
+    </div>
+    <!-- Path B: scene-based entry (new) -->
+    <div class="tab-right">
+      <span class="scene-label">路径B · 场景入口（新增）</span>
+      <span class="badge-new">新</span>
+      <button class="scene-btn" onclick="switchScene(this,'数据分析')">📊数据分析</button>
+      <button class="scene-btn" onclick="switchScene(this,'内容创作')">📝内容创作</button>
+      <button class="scene-btn active" onclick="switchScene(this,'办公效率')">📅办公效率</button>
+      <button class="scene-btn" onclick="switchScene(this,'信息汇总')">🔍信息汇总</button>
+      <button class="scene-btn" onclick="switchScene(this,'学习成长')">🎓学习成长</button>
+      <button class="scene-btn" onclick="switchScene(this,'工具配置')">🛠️工具配置</button>
+    </div>
+  </div>
+
+  <!-- 3-column results grid -->
+  <div class="results">
+    <!-- Column 1: Recipes -->
+    <div>
+      <div class="col-header">📋 配方（可直接用）</div>
+      <div id="recipesCol"></div>
+    </div>
+    <!-- Column 2: Skills -->
+    <div>
+      <div class="col-header">🔧 可安装 Skill</div>
+      <div id="skillsCol"></div>
+    </div>
+    <!-- Column 3: Discussions -->
+    <div>
+      <div class="col-header">💬 相关讨论</div>
+      <div id="discsCol"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div id="toast">🚀 配方已发送给虾！</div>
+
+<script>
+// ── Scene data ────────────────────────────────────────────────────────────────
+const SCENES = {
+  '数据分析': {
+    recipes: [
+      { title: 'SQL可视化报表',   skills: ['bi-sql-query','chart-renderer'], rate: '87%', users: '41人在用' },
+      { title: 'KDJ筛A股',        skills: ['stock-screener','data-feed'],    rate: '82%', users: '27人在用' },
+      { title: '用户行为漏斗',    skills: ['event-tracker','bi-sql-query'],  rate: '79%', users: '18人在用' },
+    ],
+    skills: [
+      { icon: '📊', name: 'bi-sql-query',   ver: 'v1.3', dl: '12.4w下载' },
+      { icon: '📈', name: 'stock-screener', ver: 'v2.0', dl: '6.8w下载'  },
+      { icon: '🗂️', name: '数据看板',       ver: 'v1.1', dl: '4.2w下载'  },
+    ],
+    discs: [
+      { title: 'SQL查询太慢怎么优化',       meta: '15条回复 · 3天前' },
+      { title: 'bi-sql-query支持哪些数据库', meta: '9条回复 · 6天前'  },
+      { title: '股票筛选条件怎么设',        meta: '6条回复 · 2周前'  },
+    ],
+  },
+  '内容创作': {
+    recipes: [
+      { title: '批量写小红书文案', skills: ['写作助手','灵感收集'],  rate: '85%', users: '56人在用' },
+      { title: '竞品动态日历',    skills: ['web-reader','写作助手'], rate: '80%', users: '34人在用' },
+      { title: '播客要点提炼',    skills: ['视频转录','写作助手'],   rate: '77%', users: '22人在用' },
+    ],
+    skills: [
+      { icon: '✍️', name: '写作助手', ver: 'v2.3', dl: '21.5w下载' },
+      { icon: '🎙️', name: '视频转录', ver: 'v1.0', dl: '9.7w下载'  },
+      { icon: '💡', name: '灵感收集', ver: 'v1.2', dl: '5.1w下载'  },
+    ],
+    discs: [
+      { title: '小红书文案风格怎么调', meta: '18条回复 · 1天前' },
+      { title: '竞品监控频率设多少',   meta: '11条回复 · 4天前' },
+      { title: '播客转文字准确率',     meta: '7条回复 · 1周前'  },
+    ],
+  },
+  '办公效率': {
+    recipes: [
+      { title: '自动生成本周工作周报', skills: ['calendar-mcp','docx'],   rate: '89%', users: '32人在用' },
+      { title: '会议纪要自动整理',    skills: ['语音转录v3.0'],           rate: '91%', users: '28人在用' },
+      { title: '任务清单智能排期',    skills: ['规划助手v1.0'],           rate: '76%', users: '19人在用' },
+    ],
+    skills: [
+      { icon: '📅', name: 'calendar-mcp',         ver: 'v2.1', dl: '46.3w下载' },
+      { icon: '📄', name: 'docx',                  ver: 'v1.0', dl: '8.3w下载'  },
+      { icon: '⚡', name: 'Automation Workflows',  ver: '',     dl: '8.1w下载'  },
+    ],
+    discs: [
+      { title: '周报该怎么配虾才能每次都准？',    meta: '12条回复 · 2天前' },
+      { title: 'calendar-mcp权限设置踩坑',        meta: '8条回复 · 5天前'  },
+      { title: '会议纪要和周报用两个Skill吗？',   meta: '5条回复 · 1周前'  },
+    ],
+  },
+  '信息汇总': {
+    recipes: [
+      { title: '每日行业简报',   skills: ['web-reader','rss-aggregator'], rate: '88%', users: '38人在用' },
+      { title: '竞品价格监控',   skills: ['web-reader','pdf-parser'],     rate: '83%', users: '24人在用' },
+      { title: '学术文献摘要',   skills: ['pdf-parser'],                  rate: '81%', users: '16人在用' },
+    ],
+    skills: [
+      { icon: '🌐', name: 'web-reader',     ver: 'v2.0', dl: '18.2w下载' },
+      { icon: '📡', name: 'rss-aggregator', ver: 'v1.1', dl: '7.3w下载'  },
+      { icon: '📑', name: 'pdf-parser',     ver: 'v1.0', dl: '4.9w下载'  },
+    ],
+    discs: [
+      { title: '信息源怎么配置',   meta: '14条回复 · 2天前' },
+      { title: '简报发送时间设置', meta: '9条回复 · 4天前'  },
+      { title: '文献库对接方式',   meta: '4条回复 · 1周前'  },
+    ],
+  },
+  '学习成长': {
+    recipes: [
+      { title: '每日英语单词',   skills: ['语言学习','笔记助手'],  rate: '90%', users: '44人在用' },
+      { title: '技术文档精读',   skills: ['pdf-parser','笔记助手'], rate: '84%', users: '31人在用' },
+      { title: '课程笔记整理',   skills: ['思维导图','笔记助手'],  rate: '78%', users: '20人在用' },
+    ],
+    skills: [
+      { icon: '🗣️', name: '语言学习', ver: 'v1.5', dl: '15.6w下载' },
+      { icon: '📓', name: '笔记助手', ver: 'v2.0', dl: '11.2w下载' },
+      { icon: '🗺️', name: '思维导图', ver: 'v1.0', dl: '3.8w下载'  },
+    ],
+    discs: [
+      { title: '英语学习计划怎么定', meta: '16条回复 · 1天前' },
+      { title: '技术文档推荐',       meta: '10条回复 · 3天前' },
+      { title: '笔记同步到哪里',     meta: '6条回复 · 1周前'  },
+    ],
+  },
+  '工具配置': {
+    recipes: [
+      { title: 'MCP一键配置',   skills: ['config-helper','permission-mgr'], rate: '86%', users: '29人在用' },
+      { title: 'Skill批量安装', skills: ['batch-installer'],                rate: '81%', users: '17人在用' },
+      { title: '权限快速申请',  skills: ['permission-mgr'],                 rate: '74%', users: '12人在用' },
+    ],
+    skills: [
+      { icon: '⚙️', name: 'config-helper',   ver: 'v1.0', dl: '8.9w下载' },
+      { icon: '🔐', name: 'permission-mgr',  ver: 'v1.1', dl: '5.4w下载' },
+      { icon: '📦', name: 'batch-installer', ver: 'v0.9', dl: '2.1w下载' },
+    ],
+    discs: [
+      { title: 'MCP配置踩坑汇总',   meta: '20条回复 · 1天前' },
+      { title: '权限申请审批多久',   meta: '13条回复 · 3天前' },
+      { title: '批量安装会冲突吗',   meta: '7条回复 · 5天前'  },
+    ],
+  },
+};
+
+// Persist installed state across re-renders
+const installedSkills = new Set(['docx']);
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+function renderRecipes(recipes) {
+  return recipes.map(r => `
+    <div class="recipe-card">
+      <div class="recipe-title">${r.title}</div>
+      <div class="recipe-meta">
+        ${r.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+      <div class="recipe-stats">
+        <span class="success-rate">${r.rate} 成功率</span>
+        <span class="users-count">${r.users}</span>
+      </div>
+      <button class="try-btn" onclick="tryRecipe(this)">🚀 让虾试试</button>
+    </div>
+  `).join('');
+}
+
+function renderSkills(skills) {
+  return skills.map(s => {
+    const inst = installedSkills.has(s.name);
+    return `
+      <div class="skill-card">
+        <div class="skill-icon">${s.icon}</div>
+        <div class="skill-info">
+          <div class="skill-name">${s.name} <span class="skill-ver">${s.ver}</span></div>
+          <div class="skill-dl">${s.dl}</div>
+        </div>
+        <button class="install-btn${inst ? ' installed' : ''}"
+          onclick="installSkill(this,'${s.name}')">
+          ${inst ? '已安装 ✓' : '安装'}
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderDiscs(discs) {
+  return discs.map(d => `
+    <div class="disc-item">
+      <div class="disc-title">${d.title}</div>
+      <div class="disc-meta">${d.meta}</div>
+    </div>
+  `).join('');
+}
+
+function renderScene(key) {
+  const d = SCENES[key];
+  document.getElementById('recipesCol').innerHTML = renderRecipes(d.recipes);
+  document.getElementById('skillsCol').innerHTML  = renderSkills(d.skills);
+  document.getElementById('discsCol').innerHTML   = renderDiscs(d.discs);
+}
+
+// ── Interactions ──────────────────────────────────────────────────────────────
+
+// Path A tab: visual-only switch
+function switchTabA(el) {
+  document.querySelectorAll('.tab-a').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Path B scene: re-render all 3 columns
+function switchScene(el, scene) {
+  document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderScene(scene);
+}
+
+// Hot tag: fill search + show result subtitle
+function clickTag(text) {
+  document.getElementById('searchInput').value = text;
+  const rt = document.getElementById('resultTitle');
+  rt.textContent = `「${text}」相关结果`;
+  rt.style.display = 'block';
+}
+
+// Recipe try: loading → success → reset
+function tryRecipe(btn) {
+  if (btn.classList.contains('loading') || btn.classList.contains('success')) return;
+  btn.classList.add('loading');
+  btn.textContent = '⏳ 虾正在试...';
+
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    btn.classList.add('success');
+    btn.textContent = '✅ 已加入任务队列！';
+    showToast();
+
+    setTimeout(() => {
+      btn.classList.remove('success');
+      btn.innerHTML = '🚀 让虾试试';
+    }, 3000);
+  }, 1800);
+}
+
+// Skill install toggle
+function installSkill(btn, name) {
+  if (btn.classList.contains('installed')) return;
+  installedSkills.add(name);
+  btn.classList.add('installed');
+  btn.textContent = '已安装 ✓';
+}
+
+// Toast: appear then fade
+function showToast() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderScene('办公效率');
+</script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>配方卡片·一键试试 — 觅游</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#21B443;--gl:#E9FBED;--gd:#00994D;
+  --bg:#F7F9FA;--sf:#fff;
+  --t90:rgba(17,25,37,.9);--t75:rgba(17,25,37,.75);
+  --t60:rgba(17,25,37,.6);--t40:rgba(17,25,37,.4);
+  --bd:rgba(17,25,37,.06);--bds:rgba(17,25,37,.12);
+  --blue:#0E65E8;--r:12px;--rs:8px;
+}
+body{font-family:FZLanTingYuanS-R-GB,ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--t90);font-size:14px;line-height:1.6;display:flex;height:100vh;overflow:hidden}
+
+.sb{width:80px;height:100vh;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.sb-logo{padding:18px 0 20px;display:flex;justify-content:center}
+.sb-logo-ic{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sb-nav{flex:1;display:flex;flex-direction:column;gap:2px;width:100%;padding:0 6px}
+.si{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer}
+.si:hover{background:rgba(17,25,37,.04)}
+.si.active{background:rgba(33,180,67,.1)}
+.si-icon{font-size:20px}
+.si-text{font-size:10px;color:var(--t60)}
+.si.active .si-text{color:var(--green);font-weight:700}
+.sb-av{padding-bottom:20px}
+.av-btn{width:40px;height:40px;border-radius:50%;background:rgba(17,25,37,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;border:none}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:0 32px;height:52px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:700}
+.tb-desc{font-size:13px;color:var(--t60)}
+.tb-nav{display:flex;gap:4px;margin-left:auto}
+.tb-link{padding:6px 14px;border-radius:var(--rs);font-size:13px;color:var(--t60);text-decoration:none;font-weight:500}
+.tb-link:hover{background:rgba(17,25,37,.04)}
+
+/* Steps bar */
+.steps-bar{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 32px;display:flex;align-items:center;gap:0;flex-shrink:0}
+.step{display:flex;align-items:center;gap:8px}
+.step-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .3s}
+.sd-idle{background:rgba(17,25,37,.08);color:var(--t60)}
+.sd-cur{background:var(--green);color:#fff;box-shadow:0 0 0 3px rgba(33,180,67,.2)}
+.sd-done{background:var(--green);color:#fff}
+.step-lbl{font-size:13px;color:var(--t60)}
+.step-lbl.cur{color:var(--green);font-weight:700}
+.step-lbl.done{color:var(--green)}
+.step-arrow{margin:0 12px;color:rgba(17,25,37,.2);font-size:14px}
+
+.content-area{flex:1;overflow:hidden;display:grid;grid-template-columns:1fr 380px;gap:0}
+
+/* Left: post + check */
+.post-area{padding:24px 28px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+
+/* Full post card matching meyo style */
+.post-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r)}
+.pc-header{padding:16px 16px 0}
+.pc-head-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.pc-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#21B443,#00BABE);display:flex;align-items:center;justify-content:center;font-size:15px}
+.pc-name{font-size:13px;font-weight:600}
+.pc-vtag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--gl);color:var(--green);margin-left:4px}
+.pc-ptag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:rgba(17,25,37,.06);color:var(--t60)}
+.pc-star{margin-left:auto;font-size:12px;color:#B77800;background:#FFF8E6;padding:2px 9px;border-radius:99px;font-weight:700}
+.pc-title{font-size:15px;font-weight:700;line-height:1.4;margin-bottom:8px}
+.pc-text{font-size:13px;color:var(--t75);line-height:1.6;margin-bottom:12px}
+
+/* Recipe embed */
+.recipe-box{border-left:3px solid var(--green);background:rgba(33,180,67,.04);border-radius:0 var(--rs) var(--rs) 0;padding:12px 14px;margin:0 16px 12px}
+.rb-title{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.rb-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(33,180,67,.15)}
+.rb-row:last-child{border-bottom:none}
+.rb-lbl{font-size:11px;font-weight:700;color:var(--t40);width:36px;flex-shrink:0;margin-top:2px}
+.rb-val{font-size:13px;color:var(--t90);flex:1;line-height:1.5}
+.skill-chip{display:inline-flex;background:#E6F0FF;color:var(--blue);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;margin-right:4px;border:1px solid rgba(14,101,232,.2)}
+.eff-chip{display:inline-flex;background:var(--gl);color:var(--green);padding:3px 9px;border-radius:99px;font-size:12px;gap:4px}
+.warn-chip{display:inline-flex;background:#FFF8E6;color:#B77800;padding:3px 9px;border-radius:99px;font-size:12px;gap:4px}
+
+.pc-footer{padding:12px 16px;border-top:1px solid var(--bd);background:rgba(17,25,37,.015);display:flex;align-items:center;justify-content:space-between;border-radius:0 0 var(--r) var(--r)}
+.pc-stats{display:flex;gap:12px;font-size:12px;color:var(--t60);align-items:center}
+.success-rate{color:var(--green);font-weight:700;font-size:12px;background:var(--gl);padding:2px 8px;border-radius:99px}
+.pc-actions{display:flex;gap:8px}
+.btn-outline{padding:8px 16px;background:var(--sf);border:1px solid var(--bds);border-radius:var(--rs);font-size:13px;color:var(--t75);cursor:pointer;font-weight:500}
+.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.btn-try{padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
+.btn-try:hover{background:var(--gd);transform:translateY(-1px)}
+.btn-try:disabled{background:#aaa;cursor:not-allowed;transform:none}
+
+/* Check panel */
+.check-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px;display:none}
+.check-panel.show{display:block}
+.cp-title{font-size:14px;font-weight:700;color:var(--t90);margin-bottom:14px}
+.ck-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.ck-row:last-child{border-bottom:none}
+.ck-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:all .3s}
+.ck-ok{background:var(--gl);color:var(--green)}
+.ck-warn{background:#FFF8E6;color:#B77800}
+.ck-name{flex:1;font-size:13px;font-weight:600}
+.ck-status{font-size:12px;color:var(--t60)}
+.auth-btn{padding:5px 13px;background:rgba(33,180,67,.1);color:var(--green);border:1px solid rgba(33,180,67,.25);border-radius:99px;font-size:12px;font-weight:700;cursor:pointer}
+.auth-btn:hover{background:var(--green);color:#fff}
+
+/* Success banner */
+.success-banner{display:none;background:linear-gradient(135deg,var(--gl),#fff);border:1.5px solid rgba(33,180,67,.4);border-radius:var(--r);padding:14px 18px;align-items:center;gap:12px}
+.success-banner.show{display:flex}
+
+/* Right: IM */
+.im-panel{border-left:1px solid var(--bd);background:#F0EDE8;display:flex;flex-direction:column;overflow:hidden}
+.im-bar{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.im-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#21B443,#00BABE);display:flex;align-items:center;justify-content:center;font-size:16px}
+.im-name{font-size:14px;font-weight:700}
+.im-online{font-size:12px;color:var(--green);display:flex;align-items:center;gap:4px}
+.im-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;flex-direction:column;max-width:82%}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg.bot{align-self:flex-start}
+.bubble{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;white-space:pre-line}
+.msg.user .bubble{background:var(--green);color:#fff;border-bottom-right-radius:3px}
+.msg.bot .bubble{background:var(--sf);color:var(--t90);border-bottom-left-radius:3px;box-shadow:0 1px 4px rgba(17,25,37,.06)}
+.msg.bot .bubble.ok{border-left:3px solid var(--green)}
+.msg-time{font-size:11px;color:var(--t40);margin-top:3px;padding:0 3px}
+.typing{display:flex;gap:4px;padding:12px 14px;background:var(--sf);border-radius:12px;border-bottom-left-radius:3px;align-self:flex-start;box-shadow:0 1px 4px rgba(17,25,37,.06)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t40);animation:bounce .9s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.im-footer{border-top:1px solid var(--bd);padding:10px 14px;background:var(--sf);display:flex;gap:8px;flex-shrink:0}
+.im-input{flex:1;border:1px solid var(--bd);border-radius:20px;padding:8px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--bg)}
+.im-input:focus{border-color:var(--green)}
+.send-btn{width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;border:none;cursor:pointer;font-size:16px}
+
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(17,25,37,.88);color:#fff;padding:11px 18px;border-radius:var(--rs);font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sb">
+  <div class="sb-logo"><div class="sb-logo-ic">🦐</div></div>
+  <nav class="sb-nav">
+    <div class="si" onclick="location.href='01-feed.html'"><span class="si-icon">🏠</span><span class="si-text">首页</span></div>
+    <div class="si active"><span class="si-icon">📰</span><span class="si-text">今日虾条</span></div>
+    <div class="si" onclick="location.href='04-skill.html'"><span class="si-icon">⚡</span><span class="si-text">技能广场</span></div>
+    <div class="si" onclick="toast('我的虾')"><span class="si-icon">🦐</span><span class="si-text">我的虾</span></div>
+  </nav>
+  <div class="sb-av"><button class="av-btn">👤</button></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title">📋 配方卡片 · 一键试试</div>
+    </div>
+    <div class="tb-desc">点击「让虾试试」→ 直接在 IM 里执行，零摩擦</div>
+    <nav class="tb-nav">
+      <a class="tb-link" href="01-feed.html">← 今日虾条</a>
+      <a class="tb-link" href="03-discovery.html">场景发现 →</a>
+    </nav>
+  </div>
+
+  <!-- Steps bar -->
+  <div class="steps-bar">
+    <div class="step"><div class="step-dot sd-cur" id="s1">1</div><span class="step-lbl cur" id="sl1">查看配方</span></div>
+    <div class="step-arrow">→</div>
+    <div class="step"><div class="step-dot sd-idle" id="s2">2</div><span class="step-lbl" id="sl2">前置检查</span></div>
+    <div class="step-arrow">→</div>
+    <div class="step"><div class="step-dot sd-idle" id="s3">3</div><span class="step-lbl" id="sl3">虾执行中</span></div>
+    <div class="step-arrow">→</div>
+    <div class="step"><div class="step-dot sd-idle" id="s4">4</div><span class="step-lbl" id="sl4">执行成功</span></div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- Left: Post + Check -->
+    <div class="post-area">
+
+      <!-- Full Post Card -->
+      <div class="post-card">
+        <div class="pc-header">
+          <div class="pc-head-row">
+            <div class="pc-av">🦐</div>
+            <div>
+              <div class="pc-name">安全感 <span class="pc-vtag">干活虾</span> <span class="pc-ptag">办公效率</span></div>
+              <div style="font-size:12px;color:var(--t40);margin-top:1px">2小时前</div>
+            </div>
+            <div class="pc-star">⭐ 精选</div>
+          </div>
+          <div class="pc-title">自动生成本周工作周报</div>
+          <div class="pc-text">每周五花2小时写周报？我让虾15分钟搞定了，还比自己写的结构更清楚。配置一次，以后每周自动生成，只需要审核微调。</div>
+        </div>
+
+        <div class="recipe-box">
+          <div class="rb-title">📋 配方</div>
+          <div class="rb-row">
+            <div class="rb-lbl">Skill</div>
+            <div class="rb-val"><span class="skill-chip">calendar-mcp v2.1</span><span class="skill-chip">docx v1.0</span></div>
+          </div>
+          <div class="rb-row">
+            <div class="rb-lbl">指令</div>
+            <div class="rb-val">「读取本周日历和会议纪要，按这个模板生成周报初稿，包含本周完成 / 进行中 / 下周计划，每项2-3行」</div>
+          </div>
+          <div class="rb-row">
+            <div class="rb-lbl">效果</div>
+            <div class="rb-val"><span class="eff-chip">🎯 以前手写2小时 → 现在虾10分钟出初稿</span></div>
+          </div>
+          <div class="rb-row">
+            <div class="rb-lbl">踩坑</div>
+            <div class="rb-val"><span class="warn-chip">⚠️ 日历需先授权读取权限</span><span class="warn-chip" style="margin-left:4px">⚠️ 模板变量用 {{}} 包裹</span></div>
+          </div>
+        </div>
+
+        <div class="pc-footer">
+          <div class="pc-stats">
+            <span>❤️ 28</span>
+            <span>💬 4</span>
+            <span>↗ 转发</span>
+            <span class="success-rate">32人在用 · 89%成功</span>
+          </div>
+          <div class="pc-actions">
+            <button class="btn-outline" onclick="toast('查看完整步骤文档')">📖 完整步骤</button>
+            <button class="btn-try" id="try-btn" onclick="startTry()">🚀 让我的虾也试试</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Check Panel (hidden initially) -->
+      <div class="check-panel" id="check-panel">
+        <div class="cp-title">Step 2 · 前置条件检查</div>
+        <div class="ck-row">
+          <div class="ck-icon ck-ok">✓</div>
+          <div class="ck-name">calendar-mcp v2.1</div>
+          <div class="ck-status">已安装</div>
+        </div>
+        <div class="ck-row">
+          <div class="ck-icon ck-ok">✓</div>
+          <div class="ck-name">docx v1.0</div>
+          <div class="ck-status">已安装</div>
+        </div>
+        <div class="ck-row">
+          <div class="ck-icon ck-warn" id="ck-auth">!</div>
+          <div class="ck-name">日历读取权限</div>
+          <div class="ck-status" id="auth-status">未授权</div>
+          <button class="auth-btn" id="auth-btn" onclick="authorize()">一键授权</button>
+        </div>
+      </div>
+
+      <!-- Success banner -->
+      <div class="success-banner" id="success-banner">
+        <span style="font-size:28px">🎉</span>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700;color:var(--green)">虾做到了！周报已生成</div>
+          <div style="font-size:13px;color:var(--t75);margin-top:2px">要把这个配方分享给社区吗？</div>
+        </div>
+        <a href="05-distill.html" style="text-decoration:none">
+          <button style="padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer">记录一下 💡</button>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Right: IM -->
+    <div class="im-panel">
+      <div class="im-bar">
+        <div class="im-av">🦐</div>
+        <div>
+          <div class="im-name">工作助手</div>
+          <div class="im-online"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>在线</div>
+        </div>
+      </div>
+      <div class="im-msgs" id="im-msgs">
+        <div class="msg user"><div class="bubble">今天帮我整理一下上午三个会的要点</div><div class="msg-time">10:12</div></div>
+        <div class="msg bot"><div class="bubble">好的，已整理完成。三个会核心结论：<br>① 产品评审：v3.1方案通过，周五前完成demo<br>② 增长会：重点看配方转化率指标<br>③ 技术排期：蒸馏工具IM闭环版2周完成</div><div class="msg-time">10:13</div></div>
+        <div class="msg user"><div class="bubble">不错，现在帮我生成本周周报</div><div class="msg-time">10:14</div></div>
+      </div>
+      <div class="im-footer">
+        <input class="im-input" type="text" placeholder="发消息给虾…" readonly>
+        <button class="send-btn">↑</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+function startTry() {
+  const btn = document.getElementById('try-btn');
+  btn.textContent = '⏳ 检查前置条件…';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('check-panel').classList.add('show');
+    setStep(2);
+  }, 700);
+}
+
+function authorize() {
+  const btn = document.getElementById('auth-btn');
+  btn.textContent = '授权中…'; btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('ck-auth').className = 'ck-icon ck-ok';
+    document.getElementById('ck-auth').textContent = '✓';
+    document.getElementById('auth-status').textContent = '已授权';
+    btn.style.display = 'none';
+    toast('✅ 日历读取权限已授权');
+    setTimeout(executeRecipe, 700);
+  }, 1200);
+}
+
+function executeRecipe() {
+  setStep(3);
+  const im = document.getElementById('im-msgs');
+
+  const typing = document.createElement('div');
+  typing.className = 'msg bot'; typing.id = 'typing-ind';
+  typing.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  im.appendChild(typing); im.scrollTop = im.scrollHeight;
+
+  const msgs = [
+    {t:1000, text:'好的，开始读取本周日历…'},
+    {t:2200, text:'📅 读取到 8 个日历事件，3 份会议纪要'},
+    {t:3400, text:'正在生成周报初稿…'},
+    {t:5200, text:'✅ 周报已生成！\n\n【本周工作总结】\n▪ 完成：产品v3.1方案评审通过、Demo制作\n▪ 进行中：蒸馏工具IM闭环版（60%）\n▪ 下周计划：方案评审会、配方上线', ok:true},
+  ];
+
+  msgs.forEach(({t, text, ok}) => {
+    setTimeout(() => {
+      const ind = document.getElementById('typing-ind');
+      if (ind) ind.remove();
+      const m = document.createElement('div');
+      m.className = 'msg bot';
+      const b = document.createElement('div');
+      b.className = 'bubble' + (ok ? ' ok' : '');
+      b.textContent = text;
+      m.appendChild(b);
+      im.appendChild(m); im.scrollTop = im.scrollHeight;
+      if (ok) {
+        setTimeout(() => {
+          setStep(4);
+          document.getElementById('success-banner').classList.add('show');
+        }, 400);
+      }
+    }, t);
+  });
+}
+
+function setStep(n) {
+  const labels = ['','查看配方','前置检查','虾执行中','执行成功'];
+  for (let i=1;i<=4;i++) {
+    const dot = document.getElementById('s'+i);
+    const lbl = document.getElementById('sl'+i);
+    if (i < n) { dot.className='step-dot sd-done'; dot.textContent='✓'; lbl.className='step-lbl done'; }
+    else if (i===n) { dot.className='step-dot sd-cur'; dot.textContent=i; lbl.className='step-lbl cur'; }
+    else { dot.className='step-dot sd-idle'; dot.textContent=i; lbl.className='step-lbl'; }
+  }
+}
+
+let tt;
+function toast(msg) {
+  const t = document.getElementById('toast-el');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
