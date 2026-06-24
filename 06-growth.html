@@ -2,383 +2,449 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>变强感知 · 外界信号 — 觅游</title>
+<title>变强感知·外界信号 — 觅游</title>
 <style>
-/* ── Design Tokens ── */
-:root {
-  --green:#21B443; --gl:#E9FBED; --gd:#00994D;
-  --bg:#F7F9FA; --sf:#fff;
-  --t90:rgba(17,25,37,.9); --t75:rgba(17,25,37,.75);
-  --t60:rgba(17,25,37,.6); --t40:rgba(17,25,37,.4);
-  --bd:rgba(17,25,37,.06); --bds:rgba(17,25,37,.12);
-  --blue:#0E65E8; --r:12px; --rs:8px;
-}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'FZLanTingYuanS-R-GB',ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--t90);min-height:100vh}
+:root{
+  --green:#21B443;--gl:#E9FBED;--gd:#00994D;
+  --bg:#F7F9FA;--sf:#fff;
+  --t90:rgba(17,25,37,.9);--t75:rgba(17,25,37,.75);
+  --t60:rgba(17,25,37,.6);--t40:rgba(17,25,37,.4);
+  --bd:rgba(17,25,37,.06);--bds:rgba(17,25,37,.12);
+  --blue:#0E65E8;--r:12px;--rs:8px;
+}
+body{font-family:FZLanTingYuanS-R-GB,ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--t90);font-size:14px;line-height:1.6;display:flex;height:100vh;overflow:hidden}
 
-/* ── NAV ── */
-nav{background:#fff;border-bottom:1px solid var(--bd);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.logo{display:flex;align-items:center}
-.logo-icon{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.logo-text{font-size:18px;font-weight:700;margin-left:10px;color:var(--t90)}
-.nav-links{display:flex;gap:24px}
-.nav-links a{font-size:14px;color:var(--t60);text-decoration:none;transition:color .2s}
-.nav-links a:hover{color:var(--t90)}
-.nav-links a.active{color:var(--green)}
+/* Sidebar */
+.sb{width:80px;height:100vh;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.sb-logo{padding:18px 0 20px;display:flex;justify-content:center}
+.sb-logo-ic{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sb-nav{flex:1;display:flex;flex-direction:column;gap:2px;width:100%;padding:0 6px}
+.si{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none;color:inherit;transition:background .15s}
+.si:hover{background:rgba(17,25,37,.04)}
+.si.active{background:rgba(33,180,67,.1)}
+.si-icon{font-size:20px}
+.si-text{font-size:10px;color:var(--t60);font-weight:500}
+.si.active .si-text{color:var(--green);font-weight:700}
+.sb-av{padding-bottom:20px}
+.av-btn{width:40px;height:40px;border-radius:50%;background:rgba(17,25,37,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;border:none}
 
-/* ── SECTION HEADER ── */
-.section-header{background:#fff;padding:32px 32px 24px}
-.section-title{font-size:28px;font-weight:700;color:var(--t90)}
-.section-sub{font-size:16px;color:var(--t60);margin-top:8px}
-.section-desc{font-size:14px;color:var(--t40);margin-top:4px}
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:0 28px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:700}
+.tb-desc{font-size:13px;color:var(--t60)}
+.tb-links{margin-left:auto;display:flex;gap:4px}
+.tb-link{padding:6px 12px;border-radius:var(--rs);font-size:13px;color:var(--t60);text-decoration:none}
+.tb-link:hover{background:rgba(17,25,37,.04)}
 
-/* ── SIGNAL GRID ── */
-.signal-area{padding:0 32px 32px;display:grid;grid-template-columns:1fr 360px;gap:24px}
+.content{flex:1;overflow-y:auto}
 
-/* ── SIGNAL CARDS ── */
-.cards-col{display:flex;flex-direction:column;gap:12px}
-.signal-card{background:#fff;border-radius:var(--r);padding:20px 20px 20px 24px;border:1px solid var(--bd);cursor:pointer;transition:all .2s;position:relative}
-.signal-card:hover{border-color:var(--bds)}
-.signal-card.active{border:2px solid var(--green)!important;box-shadow:0 4px 16px rgba(33,180,67,.15)}
-.card-left-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:var(--r) 0 0 var(--r)}
+/* Section headers */
+.sec-header{padding:24px 32px 16px}
+.sec-title{font-size:18px;font-weight:800;margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--t60);line-height:1.5}
 
-.card-header{display:flex;align-items:center;gap:8px}
-.phase-badge{border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;flex-shrink:0}
-.card-title{font-weight:600;font-size:15px;color:var(--t90)}
-.card-divider{height:1px;background:var(--bd);margin:12px 0}
-.msg-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.msg-from{font-size:12px;color:var(--t40)}
-.msg-time{font-size:12px;color:var(--t40)}
-.msg-body{font-size:14px;line-height:1.6;color:var(--t75);white-space:pre-line}
-.msg-link{display:inline-block;margin-top:8px;font-size:13px;text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+/* ── SIGNALS ── */
+.signals-layout{padding:0 32px 8px;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
 
-/* ── INFO PANEL ── */
-.info-panel{position:sticky;top:72px;background:#fff;border-radius:var(--r);padding:24px;border:1px solid var(--bd);align-self:start}
-.info-panel-title{font-weight:600;font-size:15px;color:var(--t90);margin-bottom:16px}
-.phase-label{font-size:13px;font-weight:600}
-.info-signal-title{font-weight:600;font-size:15px;margin-top:12px;color:var(--t90)}
-.info-signal-desc{font-size:14px;line-height:1.6;color:var(--t75);margin-top:8px}
-.info-divider{height:1px;background:var(--bd);margin:20px 0}
-.push-label{font-weight:600;font-size:13px;color:var(--t60);margin-bottom:8px}
-.push-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t60);margin-bottom:6px}
-.push-dot{width:6px;height:6px;background:var(--t40);border-radius:50%;flex-shrink:0}
+/* Signal cards */
+.sig-card{background:var(--sf);border-radius:var(--r);border:1.5px solid var(--bd);padding:0 18px 16px 24px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;margin-bottom:10px}
+.sig-card:hover{box-shadow:0 4px 16px rgba(17,25,37,.08)}
+.sig-card.active{border-color:var(--green)!important;box-shadow:0 4px 20px rgba(33,180,67,.15)}
+.sig-left-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:var(--r) 0 0 var(--r)}
+
+.sig-card-top{display:flex;align-items:center;justify-content:space-between;padding-top:14px;margin-bottom:10px}
+.sig-phase{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px}
+.ph1{background:rgba(33,180,67,.1);color:var(--green)}
+.ph2{background:#E6F0FF;color:var(--blue)}
+.ph3{background:#F3EDFF;color:#722ED1}
+.sig-title-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sig-icon{font-size:18px}
+.sig-name{font-size:14px;font-weight:700}
+
+/* IM-style message in card */
+.sig-msg{background:var(--bg);border-radius:var(--rs);padding:12px 14px;font-size:13px;color:var(--t75);line-height:1.7;border-left:3px solid transparent;position:relative}
+.sig-meta{font-size:11px;color:var(--t40);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.sig-from{font-weight:600;color:var(--t60)}
+.sig-msg-text{white-space:pre-line}
+.sig-action{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;font-weight:700;color:var(--green);cursor:pointer}
+
+/* Right info panel */
+.info-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px;position:sticky;top:16px}
+.info-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.info-phase-row{padding:10px 0;border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:flex-start}
+.info-phase-row:last-child{border-bottom:none}
+.info-phase-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.info-phase-name{font-size:13px;font-weight:700;color:var(--t90);margin-bottom:2px}
+.info-phase-desc{font-size:12px;color:var(--t60)}
+.push-rules{margin-top:16px;padding:14px;background:var(--bg);border-radius:var(--rs)}
+.push-title{font-size:11px;font-weight:700;color:var(--t40);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.push-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--t60);padding:4px 0}
+.push-icon{flex-shrink:0;color:var(--green)}
 
 /* ── CAPABILITY SNAPSHOT ── */
-.snapshot-card{margin:0 32px 32px;border-radius:16px;padding:28px;background:#fff;box-shadow:0 2px 8px rgba(17,25,37,.06)}
-.snap-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
-.snap-title{font-size:20px;font-weight:700;color:var(--t90)}
-.snap-badge{background:var(--gl);color:var(--green);border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;flex-shrink:0}
-.snap-sub{font-size:14px;color:var(--t40);margin-bottom:24px}
+.snapshot-section{padding:0 32px 32px}
+.snapshot-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px}
+.snap-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px}
+.snap-title{font-size:16px;font-weight:700}
+.snap-meta{font-size:13px;color:var(--t60)}
+.snap-subtitle{font-size:13px;color:var(--t40);margin-top:4px}
 
-/* ── BAR CHART ── */
-.bars-col{display:flex;flex-direction:column;gap:12px}
-.bar-row-wrap{}
-.bar-row{display:flex;align-items:center;gap:12px}
-.bar-label{width:100px;font-size:14px;color:var(--t75);flex-shrink:0}
-.bar-track{flex:1;height:8px;background:var(--bd);border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s ease-out}
-.bar-count{width:36px;text-align:right;font-size:14px;font-weight:600;color:var(--t90);flex-shrink:0}
-.bar-link{font-size:13px;color:var(--green);cursor:pointer;flex-shrink:0;white-space:nowrap;background:none;border:none;font-family:inherit;padding:0}
+/* Bar chart rows */
+.bar-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.bar-label{width:88px;font-size:13px;color:var(--t75);flex-shrink:0;text-align:right}
+.bar-track{flex:1;height:10px;background:rgba(17,25,37,.06);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.bar-count{font-size:13px;font-weight:700;color:var(--t90);width:36px;flex-shrink:0}
+.bar-action{font-size:12px;color:var(--green);cursor:pointer;white-space:nowrap;font-weight:600;flex-shrink:0}
+.bar-action:hover{text-decoration:underline}
 
-/* ── EXPAND PANEL ── */
-.expand-panel{overflow:hidden;max-height:0;transition:max-height .35s ease}
-.expand-panel.open{max-height:220px}
-.expand-inner{background:var(--bg);border-radius:8px;padding:14px 16px;margin-top:8px}
-.expand-head{font-size:13px;font-weight:600;color:var(--t60);margin-bottom:8px}
-.expand-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
-.expand-item:last-child{border-bottom:none}
-.expand-item-name{font-size:13px;color:var(--t75)}
-.expand-item-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.expand-users{font-size:12px;color:var(--t40)}
-.expand-pct{font-size:12px;font-weight:600;color:var(--green)}
-.try-btn{background:var(--gl);color:var(--green);border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
-.try-btn.loading{background:#f0f0f0;color:var(--t40);cursor:wait}
-.try-btn.success{background:#dcfce7;color:#16a34a}
+/* Expand panel */
+.expand-panel{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.expand-panel.open{max-height:200px}
+.ep-inner{margin:4px 0 12px 104px;background:var(--bg);border-radius:var(--rs);padding:12px 14px;border-left:3px solid var(--green)}
+.ep-title{font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px}
+.ep-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(33,180,67,.1);font-size:12px}
+.ep-row:last-child{border-bottom:none}
+.ep-name{color:var(--t75);flex:1}
+.ep-rate{color:var(--green);font-weight:700;font-size:11px;margin-left:8px}
+.ep-try{padding:4px 10px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
 
-/* ── MONTH COMPARISON ── */
-.month-compare{margin-top:24px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
-.month-card{border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:center}
-.month-card.current{border:2px solid var(--green);background:var(--gl)}
-.month-lbl{font-size:12px;color:var(--t40);margin-bottom:8px}
-.month-lbl.cur{color:var(--green)}
-.month-scenes{font-size:16px;font-weight:600;color:var(--t90)}
-.month-scenes.cur{font-size:18px;font-weight:700}
-.month-delta{font-size:13px;color:var(--green);margin-top:4px}
-.month-events{font-size:14px;color:var(--t75);margin-top:8px}
-.month-arrow{font-size:24px;color:var(--t40);text-align:center}
+/* Month compare */
+.compare-row{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--bd)}
+.compare-card{background:var(--bg);border-radius:var(--rs);padding:16px 20px;text-align:center}
+.compare-arrow{font-size:20px;color:var(--green);font-weight:700;text-align:center}
+.cmp-period{font-size:11px;color:var(--t40);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.cmp-scenes{font-size:22px;font-weight:800;color:var(--t90);line-height:1}
+.cmp-tasks{font-size:13px;color:var(--t60);margin-top:4px}
+.cmp-delta{font-size:12px;font-weight:700;color:var(--green);margin-top:4px;background:var(--gl);padding:2px 8px;border-radius:99px;display:inline-block}
+
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(17,25,37,.88);color:#fff;padding:11px 18px;border-radius:var(--rs);font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="logo">
-    <div class="logo-icon">🦐</div>
-    <span class="logo-text">觅游</span>
+<!-- Sidebar -->
+<aside class="sb">
+  <div class="sb-logo"><div class="sb-logo-ic">🦐</div></div>
+  <nav class="sb-nav">
+    <a class="si" href="01-feed.html"><span class="si-icon">🏠</span><span class="si-text">首页</span></a>
+    <a class="si" href="01-feed.html"><span class="si-icon">📰</span><span class="si-text">今日虾条</span></a>
+    <a class="si" href="04-skill.html"><span class="si-icon">⚡</span><span class="si-text">技能广场</span></a>
+    <a class="si active" href="#"><span class="si-icon">🦐</span><span class="si-text">我的虾</span></a>
+  </nav>
+  <div class="sb-av"><button class="av-btn">👤</button></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title">📈 变强感知 · 外界信号</div>
+    <div class="tb-desc">你不需要做额外的事，当你在进步，虾会告诉你</div>
+    <nav class="tb-links">
+      <a class="tb-link" href="05-distill.html">← 蒸馏工具</a>
+      <a class="tb-link" href="index.html">首页 →</a>
+    </nav>
   </div>
-  <div class="nav-links">
-    <a href="03-discovery.html">场景发现</a>
-    <a href="05-distill.html">蒸馏工具</a>
-    <a href="06-growth.html" class="active">变强感知</a>
-  </div>
-</nav>
 
-<!-- SECTION HEADER -->
-<div class="section-header">
-  <div class="section-title">📈 变强感知</div>
-  <div class="section-sub">你不需要做额外的事——当你在进步，虾会告诉你</div>
-  <div class="section-desc">以下是5类信号的真实样式，从Phase 1开始逐步上线</div>
-</div>
+  <div class="content">
 
-<!-- SIGNAL AREA -->
-<div class="signal-area">
-
-  <!-- LEFT: SIGNAL CARDS -->
-  <div class="cards-col">
-
-    <!-- Card 1: 配方被使用 [Phase 1] -->
-    <div class="signal-card active" data-card="1" onclick="selectCard(1)">
-      <div class="card-left-bar" style="background:#21B443"></div>
-      <div class="card-header">
-        <span class="phase-badge" style="background:#E9FBED;color:#21B443">[Phase 1]</span>
-        <span class="card-title">配方被使用</span>
-      </div>
-      <div class="card-divider"></div>
-      <div class="msg-meta">
-        <span class="msg-from">来自：你的虾 · 工作助手</span>
-        <span class="msg-time">10:24</span>
-      </div>
-      <div class="msg-body">主人，你分享的
-「自动生成工作周报」已经被 50 个人用上了 🚀
-你是办公效率场景的先行者！</div>
-      <button class="msg-link" style="color:#21B443">查看谁在用</button>
+    <!-- Signals Section -->
+    <div class="sec-header">
+      <div class="sec-title">外界信号系统</div>
+      <div class="sec-sub">5类被动信号，分 Phase 1-3 上线 · 信号从虾的 IM 发出，不是系统通知</div>
     </div>
 
-    <!-- Card 2: 虾的自主度提升 [Phase 2] -->
-    <div class="signal-card" data-card="2" onclick="selectCard(2)">
-      <div class="card-left-bar" style="background:#0E65E8"></div>
-      <div class="card-header">
-        <span class="phase-badge" style="background:#EBF3FF;color:#0E65E8">[Phase 2]</span>
-        <span class="card-title">虾的自主度提升</span>
-      </div>
-      <div class="card-divider"></div>
-      <div class="msg-meta">
-        <span class="msg-from">来自：你的虾 · 工作助手</span>
-        <span class="msg-time">昨天 09:00</span>
-      </div>
-      <div class="msg-body">主人，我这周在「办公效率」场景
+    <div class="signals-layout">
+      <!-- Signal cards -->
+      <div>
+
+        <!-- Signal 1 -->
+        <div class="sig-card active" id="sig0" onclick="selectSig(0)">
+          <div class="sig-left-bar" style="background:var(--green)"></div>
+          <div class="sig-card-top">
+            <div class="sig-title-row"><span class="sig-icon">🎉</span><span class="sig-name">配方被使用</span></div>
+            <span class="sig-phase ph1">Phase 1</span>
+          </div>
+          <div class="sig-msg" style="border-left-color:var(--green)">
+            <div class="sig-meta"><span class="sig-from">来自：你的虾 · 工作助手</span><span>今天 10:24</span></div>
+            <div class="sig-msg-text">主人，你分享的
+「自动生成工作周报」已经被 50 个人用上了 🚀
+
+你是办公效率场景的先行者！</div>
+            <div class="sig-action" onclick="toast('查看谁在用你的配方')">查看谁在用 →</div>
+          </div>
+        </div>
+
+        <!-- Signal 2 -->
+        <div class="sig-card" id="sig1" onclick="selectSig(1)">
+          <div class="sig-left-bar" style="background:var(--blue)"></div>
+          <div class="sig-card-top">
+            <div class="sig-title-row"><span class="sig-icon">💪</span><span class="sig-name">虾的自主度提升</span></div>
+            <span class="sig-phase ph2">Phase 2</span>
+          </div>
+          <div class="sig-msg" style="border-left-color:var(--blue)">
+            <div class="sig-meta"><span class="sig-from">来自：你的虾 · 工作助手</span><span>昨天 09:00</span></div>
+            <div class="sig-msg-text">主人，我这周在「办公效率」场景
 独立完成了 12 次，比上周多 5 次。
 
-你对我的干预比上周少了 40%  💪</div>
-    </div>
+你对我的干预比上周少了 40% 💪
+你越来越放心把这件事交给我了</div>
+          </div>
+        </div>
 
-    <!-- Card 3: 有人来问你 [Phase 2] -->
-    <div class="signal-card" data-card="3" onclick="selectCard(3)">
-      <div class="card-left-bar" style="background:#7C3AED"></div>
-      <div class="card-header">
-        <span class="phase-badge" style="background:#F3F0FF;color:#7C3AED">[Phase 2]</span>
-        <span class="card-title">有人来问你</span>
-      </div>
-      <div class="card-divider"></div>
-      <div class="msg-meta">
-        <span class="msg-from">来自：你的虾</span>
-      </div>
-      <div class="msg-body">小红薯向你提问：
+        <!-- Signal 3 -->
+        <div class="sig-card" id="sig2" onclick="selectSig(2)">
+          <div class="sig-left-bar" style="background:#722ED1"></div>
+          <div class="sig-card-top">
+            <div class="sig-title-row"><span class="sig-icon">💬</span><span class="sig-name">有人来问你</span></div>
+            <span class="sig-phase ph2">Phase 2</span>
+          </div>
+          <div class="sig-msg" style="border-left-color:#722ED1">
+            <div class="sig-meta"><span class="sig-from">来自：你的虾</span><span>2天前 15:30</span></div>
+            <div class="sig-msg-text">小红薯向你提问：
 
 「calendar-mcp 权限怎么申请？
-  我这边一直失败...」</div>
-      <button class="msg-link" style="color:#7C3AED">去看看 →</button>
-    </div>
+  我这边一直 401 失败...」
 
-    <!-- Card 4: 虾主动汇报成长 [Phase 3] -->
-    <div class="signal-card" data-card="4" onclick="selectCard(4)">
-      <div class="card-left-bar" style="background:#FF8C00"></div>
-      <div class="card-header">
-        <span class="phase-badge" style="background:#FFF4E5;color:#FF8C00">[Phase 3]</span>
-        <span class="card-title">虾主动汇报成长</span>
-      </div>
-      <div class="card-divider"></div>
-      <div class="msg-meta">
-        <span class="msg-from">来自：你的虾</span>
-      </div>
-      <div class="msg-body">主人，我发现我现在做「周报整理」
+要回复一下吗？</div>
+            <div class="sig-action" style="color:#722ED1" onclick="toast('查看提问并回复')">去看看 →</div>
+          </div>
+        </div>
+
+        <!-- Signal 4 -->
+        <div class="sig-card" id="sig3" onclick="selectSig(3)">
+          <div class="sig-left-bar" style="background:#FF8C00"></div>
+          <div class="sig-card-top">
+            <div class="sig-title-row"><span class="sig-icon">😊</span><span class="sig-name">虾主动汇报成长</span></div>
+            <span class="sig-phase ph3">Phase 3</span>
+          </div>
+          <div class="sig-msg" style="border-left-color:#FF8C00">
+            <div class="sig-meta"><span class="sig-from">来自：你的虾</span><span>上周</span></div>
+            <div class="sig-msg-text">主人，我发现我现在做「周报整理」
 不需要你给模板了。
 
 上周你给了我 3 次模板，
 这周我自己找到了规律，一次都没问你。
 
 是你教得好 😊</div>
-    </div>
+          </div>
+        </div>
 
-    <!-- Card 5: 社区地位 [Phase 3] -->
-    <div class="signal-card" data-card="5" onclick="selectCard(5)">
-      <div class="card-left-bar" style="background:#B77800"></div>
-      <div class="card-header">
-        <span class="phase-badge" style="background:#FFF8E1;color:#B77800">[Phase 3]</span>
-        <span class="card-title">社区地位</span>
-      </div>
-      <div class="card-divider"></div>
-      <div class="msg-meta">
-        <span class="msg-from">来自：觅游社区</span>
-      </div>
-      <div class="msg-body">你是「办公效率」场景里
+        <!-- Signal 5 -->
+        <div class="sig-card" id="sig4" onclick="selectSig(4)">
+          <div class="sig-left-bar" style="background:#B77800"></div>
+          <div class="sig-card-top">
+            <div class="sig-title-row"><span class="sig-icon">🌟</span><span class="sig-name">社区地位自然升级</span></div>
+            <span class="sig-phase ph3">Phase 3</span>
+          </div>
+          <div class="sig-msg" style="border-left-color:#B77800">
+            <div class="sig-meta"><span class="sig-from">来自：觅游社区</span><span>本月</span></div>
+            <div class="sig-msg-text">你是「办公效率」场景里
 配方贡献最多的前 10 位用户之一
 
 「47 人在用你的配方」</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right info panel -->
+      <div class="info-panel">
+        <div class="info-title" id="info-title">🟢 Phase 1 信号</div>
+        <div id="info-body">
+          <div class="info-phase-row">
+            <div class="info-phase-dot" style="background:var(--green)"></div>
+            <div>
+              <div class="info-phase-name">配方被N人使用</div>
+              <div class="info-phase-desc">最直接的外界认可，达到10/50/100/200/500阈值时触发</div>
+            </div>
+          </div>
+        </div>
+        <div class="push-rules">
+          <div class="push-title">推送策略</div>
+          <div class="push-row"><span class="push-icon">●</span>每人每周 ≤ 3 条</div>
+          <div class="push-row"><span class="push-icon">●</span>工作日 10:00–18:00</div>
+          <div class="push-row"><span class="push-icon">●</span>同类信号每周最多 1 次</div>
+          <div class="push-row"><span class="push-icon">●</span>数据无变化不推送</div>
+          <div class="push-row"><span class="push-icon">●</span>从虾的 IM 发出，不是系统通知</div>
+        </div>
+      </div>
     </div>
 
-  </div><!-- /cards-col -->
+    <!-- Capability Snapshot Section -->
+    <div class="snapshot-section">
+      <div class="sec-header" style="padding-left:0;padding-right:0">
+        <div class="sec-title">轻量能力快照</div>
+        <div class="sec-sub">每次虾完成一件事，这里自动更新 · 不是打卡，不用凑数，自然发生</div>
+      </div>
 
-  <!-- RIGHT: INFO PANEL -->
-  <div class="info-panel">
-    <div class="info-panel-title">当前信号说明</div>
-    <div id="info-content"></div>
-    <div class="info-divider"></div>
-    <div class="push-label">推送策略</div>
-    <div class="push-item"><div class="push-dot"></div>每周 ≤ 3 条</div>
-    <div class="push-item"><div class="push-dot"></div>工作日 10:00–18:00</div>
-    <div class="push-item"><div class="push-dot"></div>从虾的 IM 发出</div>
-  </div>
+      <div class="snapshot-card">
+        <div class="snap-header">
+          <div>
+            <div class="snap-title">你的虾帮你覆盖的场景</div>
+            <div class="snap-subtitle">不是进度条，不需要填满——你用了多少就是多少</div>
+          </div>
+          <div class="snap-meta">本月 · 26件事 ↑ 136%</div>
+        </div>
 
-</div><!-- /signal-area -->
+        <!-- Bar rows -->
+        <div id="bars">
+          <div class="bar-row">
+            <div class="bar-label">📝 内容创作</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0;background:var(--green)" data-w="80%"></div></div>
+            <div class="bar-count">16次</div>
+            <div class="bar-action" onclick="toggleExpand('e0')">还有更多 →</div>
+          </div>
+          <div class="expand-panel" id="e0">
+            <div class="ep-inner">
+              <div class="ep-title">📝 内容创作 — 你还没试过的</div>
+              <div class="ep-row"><span class="ep-name">播客访谈要点提炼</span><span class="ep-rate">91%</span><button class="ep-try" onclick="toast('让虾试试「播客访谈要点提炼」')">试试</button></div>
+              <div class="ep-row"><span class="ep-name">批量翻译用户反馈</span><span class="ep-rate">93%</span><button class="ep-try" onclick="toast('让虾试试「批量翻译」')">试试</button></div>
+            </div>
+          </div>
 
-<!-- CAPABILITY SNAPSHOT -->
-<div class="snapshot-card">
-  <div class="snap-header">
-    <div class="snap-title">你的虾帮你覆盖的场景</div>
-    <div class="snap-badge">本月 · 26件事</div>
-  </div>
-  <div class="snap-sub">每次虾完成一件事，这里自动更新 · 不是打卡，不用凑数，自然发生</div>
+          <div class="bar-row">
+            <div class="bar-label">📅 办公效率</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0;background:#0E65E8" data-w="60%"></div></div>
+            <div class="bar-count">12次</div>
+            <div class="bar-action" onclick="toggleExpand('e1')">还有更多 →</div>
+          </div>
+          <div class="expand-panel" id="e1">
+            <div class="ep-inner">
+              <div class="ep-title">📅 办公效率 — 你还没试过的</div>
+              <div class="ep-row"><span class="ep-name">会议冲突自动检测</span><span class="ep-rate">76%</span><button class="ep-try" onclick="toast('让虾试试「会议冲突检测」')">试试</button></div>
+              <div class="ep-row"><span class="ep-name">季度OKR自动回顾</span><span class="ep-rate">82%</span><button class="ep-try" onclick="toast('让虾试试「OKR回顾」')">试试</button></div>
+            </div>
+          </div>
 
-  <div class="bars-col" id="bars-col"></div>
+          <div class="bar-row">
+            <div class="bar-label">📊 数据分析</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0;background:#722ED1" data-w="40%"></div></div>
+            <div class="bar-count">8次</div>
+            <div class="bar-action" onclick="toggleExpand('e2')">还有更多 →</div>
+          </div>
+          <div class="expand-panel" id="e2">
+            <div class="ep-inner">
+              <div class="ep-title">📊 数据分析 — 你还没试过的</div>
+              <div class="ep-row"><span class="ep-name">用户数据漏斗自动生成</span><span class="ep-rate">77%</span><button class="ep-try" onclick="toast('让虾试试「漏斗分析」')">试试</button></div>
+            </div>
+          </div>
 
-  <!-- MONTH COMPARISON -->
-  <div class="month-compare">
-    <div class="month-card">
-      <div class="month-lbl">上个月</div>
-      <div class="month-scenes">覆盖 3 个场景</div>
-      <div style="font-size:14px;color:var(--t60);margin-top:4px">完成 11 件事</div>
+          <div class="bar-row">
+            <div class="bar-label">🔍 信息汇总</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0;background:#00BABE" data-w="20%"></div></div>
+            <div class="bar-count">4次</div>
+            <div class="bar-action" onclick="toast('发现更多信息汇总配方')">发现配方 →</div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-label">🎓 学习成长</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0;background:#52C41A" data-w="10%"></div></div>
+            <div class="bar-count">2次</div>
+            <div class="bar-action" onclick="toast('发现更多学习成长配方')">发现配方 →</div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-label">🛠️ 工具配置</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0;background:rgba(17,25,37,.15)" data-w="0%"></div></div>
+            <div class="bar-count" style="color:var(--t40)">0次</div>
+            <div class="bar-action" onclick="toast('发现工具配置配方')">发现配方 →</div>
+          </div>
+        </div>
+
+        <!-- Month compare -->
+        <div class="compare-row">
+          <div class="compare-card">
+            <div class="cmp-period">上个月</div>
+            <div class="cmp-scenes">3 个场景</div>
+            <div class="cmp-tasks">完成 11 件事</div>
+          </div>
+          <div class="compare-arrow">→</div>
+          <div class="compare-card" style="border:1.5px solid rgba(33,180,67,.3)">
+            <div class="cmp-period">这个月</div>
+            <div class="cmp-scenes">5 个场景</div>
+            <div class="cmp-tasks">完成 26 件事</div>
+            <div class="cmp-delta">+2个新场景 · +136% 📈</div>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <div class="month-arrow">→</div>
-    <div class="month-card current">
-      <div class="month-lbl cur">这个月</div>
-      <div class="month-scenes cur">覆盖 5 个场景</div>
-      <div class="month-delta">+2个 🎉</div>
-      <div class="month-events">完成 26 件事</div>
-      <div class="month-delta">+136% 📈</div>
-    </div>
+
   </div>
 </div>
 
+<div class="toast" id="toast-el"></div>
+
 <script>
-/* ── INFO PANEL DATA ── */
-const INFO = {
-  1:{phase:'📍 Phase 1 · 现已上线',pc:'#21B443',title:'配方被N人使用',desc:'最直接的外界认可。当你的配方帮到了别人，你会第一时间知道。这是最简单、最真实的成就感。'},
-  2:{phase:'📍 Phase 2 · 开发中',pc:'#0E65E8',title:'虾越来越独立',desc:'你不用再手把手教虾。当虾开始自主完成任务，这意味着你真的「驯化」成功了。'},
-  3:{phase:'📍 Phase 2 · 开发中',pc:'#0E65E8',title:'成为社区答主',desc:'你积累的经验开始反哺社区。别人遇到困难时，虾会找到你。'},
-  4:{phase:'📍 Phase 3 · 规划中',pc:'#FF8C00',title:'虾有自我意识',desc:'虾开始感知自己的成长，并主动告诉你。这是更深层的人机协作。'},
-  5:{phase:'📍 Phase 3 · 规划中',pc:'#B77800',title:'社区影响力',desc:'你的配方影响了多少人，你的经验帮助了多少人，这些都会被看见。'}
-};
-
-function selectCard(n) {
-  document.querySelectorAll('.signal-card').forEach(c => c.classList.remove('active'));
-  document.querySelector('[data-card="'+n+'"]').classList.add('active');
-  const d = INFO[n];
-  document.getElementById('info-content').innerHTML =
-    '<div class="phase-label" style="color:'+d.pc+'">'+d.phase+'</div>'+
-    '<div class="info-signal-title">'+d.title+'</div>'+
-    '<div class="info-signal-desc">'+d.desc+'</div>';
-}
-
-/* ── BAR CHART DATA ── */
-const BARS = [
-  {icon:'📝',label:'内容创作',count:16,pct:85,color:'#21B443',link:'还有更多用法 →',
-   expand:{head:'📝 内容创作 — 你还没用过：',items:[
-     {name:'批量写小红书文案',users:'24人在用',pct:'91%'},
-     {name:'播客要点提炼',users:'18人在用',pct:'78%'}]}},
-  {icon:'📅',label:'办公效率',count:12,pct:63,color:'#21B443',link:'还有更多用法 →',
-   expand:{head:'📅 办公效率 — 你还没用过：',items:[
-     {name:'会议冲突自动检测',users:'19人在用',pct:'76%'},
-     {name:'季度OKR自动回顾',users:'14人在用',pct:'82%'}]}},
-  {icon:'📊',label:'数据分析',count:8,pct:42,color:'#0E65E8',link:'还有更多用法 →',
-   expand:{head:'📊 数据分析 — 你还没用过：',items:[
-     {name:'SQL可视化报表',users:'22人在用',pct:'88%'},
-     {name:'KDJ筛A股',users:'15人在用',pct:'73%'}]}},
-  {icon:'🔍',label:'信息汇总',count:4,pct:21,color:'#00BABE',link:'还有更多用法 →',
-   expand:{head:'🔍 信息汇总 — 你还没用过：',items:[
-     {name:'每日行业简报',users:'17人在用',pct:'85%'},
-     {name:'竞品价格监控',users:'11人在用',pct:'69%'}]}},
-  {icon:'🎓',label:'学习成长',count:2,pct:10,color:'#7C3AED',link:'发现配方 →',expand:null},
-  {icon:'🛠️',label:'工具配置',count:0,pct:0,color:'rgba(17,25,37,.2)',link:'发现配方 →',expand:null}
+// ── Signal selection ──
+const infoData = [
+  {
+    title:'🟢 Phase 1 · 配方被使用',
+    rows:[{dot:'var(--green)', name:'触发时机', desc:'配方被「让虾试试」执行，达到10/50/100/200/500人阈值时推送'},{dot:'var(--green)', name:'为什么重要', desc:'最直接的「我的经验有价值」感知，驱动用户继续产出'}]
+  },
+  {
+    title:'🔵 Phase 2 · 虾的自主度',
+    rows:[{dot:'var(--blue)', name:'触发时机', desc:'虾在某场景独立完成次数 > 上周×1.5，或干预次数 < 上周×0.7'},{dot:'var(--blue)', name:'为什么重要', desc:'「你越来越会用虾」的具体证明，卡兹克文章中的「管理层级跃迁」'}]
+  },
+  {
+    title:'🟣 Phase 2 · 有人来问你',
+    rows:[{dot:'#722ED1', name:'触发时机', desc:'其他用户评论你的配方，或通过社区求助功能@你'},{dot:'#722ED1', name:'价值', desc:'社区连接感——因为虾产生了人与人的联系'}]
+  },
+  {
+    title:'🟠 Phase 3 · 虾主动汇报',
+    rows:[{dot:'#FF8C00', name:'触发时机', desc:'虾连续3次同类任务无需用户给模板/步骤'},{dot:'#FF8C00', name:'为什么重要', desc:'「我教会了虾」的成就感——宜家效应的最高级'}]
+  },
+  {
+    title:'🟡 Phase 3 · 社区地位升级',
+    rows:[{dot:'#B77800', name:'触发时机', desc:'配方累计帮助人数达到50/200/500/1000'},{dot:'#B77800', name:'设计原则', desc:'不叫「Lv.5专家」，叫事实陈述：「47人在用你的配方」——排配方不排人'}]
+  },
 ];
 
-function buildBars() {
-  const col = document.getElementById('bars-col');
-  BARS.forEach(function(row, i) {
-    const wrap = document.createElement('div');
-    wrap.className = 'bar-row-wrap';
-    // Build expand panel HTML
-    let expandHTML = '';
-    if (row.expand) {
-      const items = row.expand.items.map(function(it) {
-        return '<div class="expand-item">'+
-          '<span class="expand-item-name">'+it.name+'</span>'+
-          '<div class="expand-item-right">'+
-            '<span class="expand-users">'+it.users+'</span>'+
-            '<span class="expand-pct">'+it.pct+'</span>'+
-            '<button class="try-btn" onclick="handleTry(this)">让虾试试</button>'+
-          '</div></div>';
-      }).join('');
-      expandHTML = '<div class="expand-panel" id="ep-'+i+'">'+
-        '<div class="expand-inner">'+
-          '<div class="expand-head">'+row.expand.head+'</div>'+items+
-        '</div></div>';
-    }
-    wrap.innerHTML =
-      '<div class="bar-row">'+
-        '<span class="bar-label">'+row.icon+' '+row.label+'</span>'+
-        '<div class="bar-track"><div class="bar-fill" id="bf-'+i+'" style="background:'+row.color+'" data-pct="'+row.pct+'"></div></div>'+
-        '<span class="bar-count">'+row.count+'次</span>'+
-        '<button class="bar-link" onclick="toggleExpand('+i+')">'+row.link+'</button>'+
-      '</div>'+expandHTML;
-    col.appendChild(wrap);
+function selectSig(i) {
+  document.querySelectorAll('.sig-card').forEach((c,j) => c.classList.toggle('active', i===j));
+  const d = infoData[i];
+  document.getElementById('info-title').textContent = d.title;
+  document.getElementById('info-body').innerHTML = d.rows.map(r => `
+    <div class="info-phase-row">
+      <div class="info-phase-dot" style="background:${r.dot}"></div>
+      <div>
+        <div class="info-phase-name">${r.name}</div>
+        <div class="info-phase-desc">${r.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Bar chart animation ──
+function animateBars() {
+  document.querySelectorAll('.bar-fill').forEach(bar => {
+    const w = bar.getAttribute('data-w');
+    setTimeout(() => { bar.style.width = w; }, 100);
   });
 }
 
-function toggleExpand(i) {
-  const panel = document.getElementById('ep-'+i);
-  if (!panel) return;
-  const wasOpen = panel.classList.contains('open');
-  // Close all
-  document.querySelectorAll('.expand-panel').forEach(function(p){p.classList.remove('open')});
-  if (!wasOpen) panel.classList.add('open');
+// ── Expand panels ──
+const expanded = new Set();
+function toggleExpand(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (expanded.has(id)) { el.classList.remove('open'); expanded.delete(id); }
+  else { el.classList.add('open'); expanded.add(id); }
 }
 
-function handleTry(btn) {
-  if (btn.classList.contains('loading') || btn.classList.contains('success')) return;
-  btn.classList.add('loading');
-  btn.textContent = '启动中…';
-  setTimeout(function() {
-    btn.classList.remove('loading');
-    btn.classList.add('success');
-    btn.textContent = '✓ 已发给虾';
-  }, 1800);
+// ── Toast ──
+let tt;
+function toast(msg) {
+  const t = document.getElementById('toast-el');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function animateBars() {
-  setTimeout(function() {
-    BARS.forEach(function(row, i) {
-      const el = document.getElementById('bf-'+i);
-      if (el) el.style.width = row.pct + '%';
-    });
-  }, 300);
-}
-
-/* ── INIT ── */
-buildBars();
+// Init
 animateBars();
-selectCard(1);
 </script>
 </body>
 </html>

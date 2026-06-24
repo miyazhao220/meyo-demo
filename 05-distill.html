@@ -2,464 +2,441 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>觅游 · 蒸馏工具</title>
+<title>蒸馏工具·IM内闭环 — 觅游</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --green:#21B443;--gl:#E9FBED;--gd:#00994D;
-    --bg:#F7F9FA;--sf:#fff;
-    --t90:rgba(17,25,37,.9);--t75:rgba(17,25,37,.75);
-    --t60:rgba(17,25,37,.6);--t40:rgba(17,25,37,.4);
-    --bd:rgba(17,25,37,.06);--bds:rgba(17,25,37,.12);
-    --blue:#0E65E8;--r:12px;--rs:8px;
-  }
-  body{font-family:'FZLanTingYuanS-R-GB',ui-sans-serif,system-ui,sans-serif;background:var(--bg);display:flex;height:100vh;overflow:hidden;color:var(--t90)}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#21B443;--gl:#E9FBED;--gd:#00994D;
+  --bg:#F7F9FA;--sf:#fff;
+  --t90:rgba(17,25,37,.9);--t75:rgba(17,25,37,.75);
+  --t60:rgba(17,25,37,.6);--t40:rgba(17,25,37,.4);
+  --bd:rgba(17,25,37,.06);--bds:rgba(17,25,37,.12);
+  --blue:#0E65E8;--r:12px;--rs:8px;
+}
+body{font-family:FZLanTingYuanS-R-GB,ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--t90);font-size:14px;line-height:1.6;display:flex;height:100vh;overflow:hidden}
 
-  /* ── Left IM Panel ── */
-  .im-panel{width:40%;height:100vh;background:#F0EDE8;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
-  .im-topbar{background:#fff;border-bottom:1px solid var(--bd);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-  .im-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#21B443,#00994D);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-  .im-info{flex:1}
-  .im-name{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
-  .online-dot{width:8px;height:8px;background:#21B443;border-radius:50%;display:inline-block}
-  .im-status{font-size:12px;color:var(--t60);margin-top:1px}
-  .im-menu{font-size:20px;color:var(--t60);cursor:pointer;letter-spacing:2px}
-  .im-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+/* Sidebar */
+.sb{width:80px;height:100vh;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.sb-logo{padding:18px 0 20px;display:flex;justify-content:center}
+.sb-logo-ic{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sb-nav{flex:1;display:flex;flex-direction:column;gap:2px;width:100%;padding:0 6px}
+.si{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none;color:inherit;transition:background .15s}
+.si:hover{background:rgba(17,25,37,.04)}
+.si.active{background:rgba(33,180,67,.1)}
+.si-icon{font-size:20px}
+.si-text{font-size:10px;color:var(--t60);font-weight:500}
+.si.active .si-text{color:var(--green);font-weight:700}
+.sb-av{padding-bottom:20px}
+.av-btn{width:40px;height:40px;border-radius:50%;background:rgba(17,25,37,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;border:none}
 
-  /* Chat bubbles */
-  .msg-row{display:flex}
-  .msg-row.user{justify-content:flex-end}
-  .msg-row.bot{justify-content:flex-start}
-  .bubble{font-size:14px;line-height:1.5}
-  .bubble.user{background:var(--green);color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;max-width:75%}
-  .bubble.bot{background:#fff;border-radius:18px 18px 18px 4px;padding:10px 14px;max-width:80%;box-shadow:0 1px 3px rgba(17,25,37,.08)}
-  .bubble.trigger{background:var(--gl);border-left:3px solid var(--green);border-radius:0 18px 18px 0;padding:12px 14px;max-width:80%;box-shadow:0 1px 3px rgba(17,25,37,.08)}
-  .msg-time{font-size:11px;color:var(--t40);margin-top:4px;text-align:right}
-  .msg-row.bot .msg-time{text-align:left}
-  .skill-tag{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--t60);margin-top:6px}
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:0 28px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:700}
+.tb-desc{font-size:13px;color:var(--t60)}
+.tb-links{margin-left:auto;display:flex;gap:4px}
+.tb-link{padding:6px 12px;border-radius:var(--rs);font-size:13px;color:var(--t60);text-decoration:none}
+.tb-link:hover{background:rgba(17,25,37,.04);color:var(--t90)}
 
-  /* Mini bar chart */
-  .mini-chart{margin-top:8px}
-  .chart-bars{display:flex;align-items:flex-end;gap:4px;height:36px;margin-bottom:4px}
-  .chart-bar{width:20px;background:var(--green);border-radius:3px 3px 0 0;opacity:.85}
-  .chart-labels{display:flex;gap:4px}
-  .chart-label{width:20px;font-size:9px;color:var(--t60);text-align:center}
-  .chart-nums{font-size:11px;color:var(--t60);margin-top:4px}
+/* Two-panel layout */
+.panels{flex:1;display:grid;grid-template-columns:400px 1fr;overflow:hidden}
 
-  /* Trigger buttons */
-  .trigger-btns{display:flex;gap:8px;margin-top:10px}
-  .btn-distill{background:var(--green);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .2s}
-  .btn-distill:hover{opacity:.88}
-  .btn-share{background:var(--bd);color:var(--t75);border:none;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:inherit;transition:background .2s}
-  .btn-share:hover{background:var(--bds)}
+/* ── LEFT: IM Panel ── */
+.im-panel{background:#F0EDE8;border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.im-bar{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.im-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#21B443,#00BABE);display:flex;align-items:center;justify-content:center;font-size:16px}
+.im-online{font-size:12px;color:var(--green);display:flex;align-items:center;gap:4px}
+.im-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;flex-direction:column;max-width:85%}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg.bot{align-self:flex-start}
+.bubble{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;white-space:pre-line}
+.msg.user .bubble{background:var(--green);color:#fff;border-bottom-right-radius:3px}
+.msg.bot .bubble{background:var(--sf);color:var(--t90);border-bottom-left-radius:3px;box-shadow:0 1px 4px rgba(17,25,37,.06)}
+.msg.bot .bubble.trigger{border-left:3px solid var(--green);background:rgba(33,180,67,.06)}
+.msg.bot .bubble.ok{border-left:3px solid var(--green)}
+.msg-time{font-size:11px;color:var(--t40);margin-top:3px;padding:0 3px}
 
-  /* ── Right Distill Panel ── */
-  .distill-panel{flex:1;overflow-y:auto;padding:28px;background:var(--bg)}
-  .panel-title{font-size:20px;font-weight:700;margin-bottom:4px}
-  .panel-sub{color:var(--t60);font-size:14px;margin-bottom:20px}
+/* Trigger buttons */
+.trigger-btns{display:flex;gap:8px;margin-top:6px}
+.btn-record{padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-record:hover{background:var(--gd);transform:translateY(-1px)}
+.btn-record:disabled{background:#aaa;cursor:not-allowed;transform:none}
+.btn-share{padding:8px 14px;background:var(--sf);border:1px solid var(--bds);border-radius:var(--rs);font-size:13px;color:var(--t60);cursor:pointer}
+.btn-share:hover{border-color:var(--green);color:var(--green)}
 
-  /* Step indicator */
-  .steps{display:flex;align-items:center;margin-bottom:20px}
-  .step{display:flex;flex-direction:column;align-items:center;gap:4px}
-  .step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .4s}
-  .step-circle.done{background:var(--green);color:#fff}
-  .step-circle.active{background:var(--green);color:#fff;box-shadow:0 0 0 3px rgba(33,180,67,.2)}
-  .step-circle.idle{background:rgba(17,25,37,.08);color:var(--t40)}
-  .step-label{font-size:12px;color:var(--t60)}
-  .step-line{flex:1;height:1px;background:var(--bds);margin:0 6px;margin-bottom:16px}
+/* ── RIGHT: Distill Flow ── */
+.distill-panel{overflow-y:auto;padding:28px}
 
-  /* Content card */
-  .card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 8px rgba(17,25,37,.06)}
-  .card-title{font-weight:600;font-size:15px;margin-bottom:16px}
+/* Step bar */
+.step-bar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:0}
+.stp{display:flex;align-items:center;gap:8px;flex:1}
+.stp-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .3s}
+.sn-idle{background:rgba(17,25,37,.08);color:var(--t60)}
+.sn-cur{background:var(--green);color:#fff;box-shadow:0 0 0 3px rgba(33,180,67,.2)}
+.sn-done{background:var(--green);color:#fff}
+.stp-lbl{font-size:13px;color:var(--t60)}
+.stp-lbl.cur{color:var(--green);font-weight:700}
+.stp-lbl.done{color:var(--green)}
+.stp-arrow{color:rgba(17,25,37,.2);padding:0 10px}
 
-  /* Detection items */
-  .detect-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
-  .detect-item:last-child{border-bottom:none}
-  .info-box{background:var(--gl);border-radius:8px;padding:12px 16px;margin-top:16px;font-size:13px}
-  .info-box b{font-weight:500;display:block;margin-bottom:4px}
-  .info-note{font-style:italic;color:var(--t60);font-size:12px;margin-top:12px}
+/* Flow cards */
+.flow-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:22px;margin-bottom:14px;display:none}
+.flow-card.show{display:block}
+.fc-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.detect-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.detect-row:last-child{border-bottom:none}
+.detect-icon{font-size:16px;width:22px;text-align:center}
 
-  /* Field rows (State 1) */
-  .field-row{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--bd);opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
-  .field-row.visible{opacity:1;transform:none}
-  .field-label{font-size:13px;color:var(--t60);width:80px;flex-shrink:0;padding-top:2px}
-  .field-value{font-size:14px;color:var(--t90);flex:1}
-  .auto-badge{display:inline-block;background:var(--gl);color:var(--green);border-radius:4px;padding:2px 6px;font-size:11px;margin-right:6px}
-  .loading-text{color:var(--t40);font-size:13px}
-  .progress-text{color:var(--green);font-size:14px;font-weight:500;margin-top:16px}
+/* Auto-fill rows */
+.fill-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.fill-row:last-of-type{border-bottom:none}
+.fill-label{font-size:11px;font-weight:700;color:var(--t40);width:56px;flex-shrink:0;margin-top:3px}
+.fill-val{flex:1;font-size:13px;color:var(--t90)}
+.fill-val.loading{color:var(--t40);display:flex;align-items:center;gap:6px}
+.fill-val.done{display:flex;align-items:flex-start;gap:6px}
+.auto-badge{font-size:10px;font-weight:700;background:var(--green);color:#fff;padding:2px 6px;border-radius:4px;flex-shrink:0;margin-top:1px}
+.fill-summary{margin-top:14px;padding:10px 14px;background:var(--gl);border-radius:var(--rs);font-size:13px;color:var(--green);font-weight:600;display:none}
 
-  /* State 2 form */
-  .form-label{font-size:14px;color:var(--t75);margin-bottom:6px;display:block}
-  .form-label.warn{color:#FF8C00}
-  textarea{width:100%;border:1px solid var(--bds);border-radius:8px;padding:10px;font-size:14px;font-family:inherit;min-height:72px;resize:vertical;color:var(--t90);outline:none;transition:border-color .2s}
-  textarea:focus{border-color:var(--green)}
-  .form-group{margin-top:12px}
-  .action-btns{display:flex;gap:12px;margin-top:16px}
-  .btn-outline{border:1px solid var(--bds);background:#fff;color:var(--t75);border-radius:8px;padding:9px 20px;font-size:14px;cursor:pointer;font-family:inherit;transition:border-color .2s}
-  .btn-outline:hover{border-color:var(--green)}
-  .btn-primary{background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:14px;cursor:pointer;font-family:inherit;transition:opacity .2s}
-  .btn-primary:hover{opacity:.88}
+/* Confirm form */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:700;color:var(--t60);margin-bottom:6px;display:block}
+.form-label .req{color:var(--green)}
+.form-input,.form-textarea{width:100%;border:1.5px solid var(--bd);border-radius:var(--rs);padding:10px 13px;font-size:13px;font-family:inherit;color:var(--t90);outline:none;transition:border-color .2s;background:var(--sf)}
+.form-input:focus,.form-textarea:focus{border-color:var(--green)}
+.form-textarea{resize:vertical;min-height:56px}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
 
-  /* State 3 */
-  .check-item{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:14px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
-  .check-item.visible{opacity:1;transform:none}
-  .success-rate{font-size:18px;font-weight:700;color:var(--green);margin-top:8px;opacity:0;transition:opacity .4s}
-  .success-rate.visible{opacity:1}
-  .btn-publish{background:var(--green);color:#fff;border:none;border-radius:8px;padding:11px;font-size:15px;cursor:pointer;font-family:inherit;width:100%;margin-top:16px;font-weight:600;opacity:0;transition:opacity .3s,transform .2s}
-  .btn-publish.visible{opacity:1}
-  .btn-publish:hover{transform:translateY(-1px)}
+/* Precheck */
+.ck-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.ck-row:last-of-type{border-bottom:none}
+.ck-icon{font-size:16px;width:22px;text-align:center}
+.ck-name{flex:1;font-weight:600}
+.ck-status{color:var(--t60)}
+.rate-row{margin-top:14px;padding:14px;background:var(--gl);border-radius:var(--rs);display:none;align-items:center;gap:12px}
+.rate-row.show{display:flex}
+.rate-num{font-size:24px;font-weight:800;color:var(--green)}
 
-  /* State 4 */
-  .success-card{background:var(--gl);border:1px solid var(--green);border-radius:12px;padding:24px;text-align:center}
-  .success-emoji{font-size:40px;margin-bottom:8px}
-  .success-title{font-size:20px;font-weight:700;color:var(--green);margin-bottom:8px}
-  .success-desc{font-size:14px;color:var(--t75)}
-  .success-divider{height:1px;background:rgba(33,180,67,.2);margin:16px 0}
-  .success-note{font-size:13px;color:var(--t60)}
+/* Done card */
+.done-card{background:linear-gradient(135deg,var(--gl),var(--sf));border:1.5px solid rgba(33,180,67,.3);border-radius:var(--r);padding:24px;text-align:center}
+.done-icon{font-size:48px;margin-bottom:12px}
+.done-title{font-size:20px;font-weight:800;color:var(--green);margin-bottom:6px}
+.done-sub{font-size:14px;color:var(--t75);margin-bottom:18px}
+.next-items{background:var(--sf);border-radius:var(--rs);padding:14px 16px;text-align:left;margin-bottom:16px}
+.next-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--t75);border-bottom:1px solid var(--bd)}
+.next-item:last-child{border-bottom:none}
 
-  /* Collapsible */
-  .collapsible{margin-top:20px}
-  .collapsible-header{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--t60);font-size:13px;user-select:none}
-  .collapsible-arrow{transition:transform .25s;display:inline-block}
-  .collapsible-arrow.open{transform:rotate(90deg)}
-  .collapsible-body{overflow:hidden;max-height:0;transition:max-height .3s ease}
-  .collapsible-body.open{max-height:300px}
-  .collapsible-inner{padding:14px;background:#fff;border-radius:8px;margin-top:8px;font-size:13px;color:var(--t75)}
-  .tpl-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd)}
-  .tpl-key{color:var(--t60);width:40px;flex-shrink:0}
+/* Alt route */
+.alt-box{margin-top:14px;background:var(--bg);border-radius:var(--rs);padding:14px;border:1px dashed var(--bds)}
+.alt-toggle{font-size:12px;color:var(--t60);cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600}
+.alt-toggle:hover{color:var(--green)}
+.alt-content{display:none;margin-top:12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:12px}
+.alt-content.show{display:block}
 
-  /* State visibility */
-  .state{display:none}
-  .state.active{display:block}
+/* Buttons */
+.btn-primary{padding:10px 20px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary:hover{background:var(--gd);transform:translateY(-1px)}
+.btn-primary:disabled{background:#aaa;transform:none;cursor:not-allowed}
+.btn-ghost{padding:10px 16px;background:var(--sf);border:1px solid var(--bds);border-radius:var(--rs);font-size:13px;color:var(--t60);cursor:pointer}
+.btn-ghost:hover{border-color:var(--green);color:var(--green)}
 
-  /* Toast */
-  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(17,25,37,.88);color:#fff;border-radius:8px;padding:10px 20px;font-size:14px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:999}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Typing dots */
+.typing{display:inline-flex;gap:4px;padding:2px 0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--t40);animation:bounce .9s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(17,25,37,.88);color:#fff;padding:11px 18px;border-radius:var(--rs);font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
-<aside style="width:80px;height:100vh;background:#fff;border-right:1px solid rgba(17,25,37,.06);display:flex;flex-direction:column;align-items:center;flex-shrink:0">
-  <div style="padding:18px 0 20px"><div style="width:36px;height:36px;background:#21B443;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">🦐</div></div>
-  <nav style="flex:1;display:flex;flex-direction:column;gap:2px;width:100%;padding:0 6px">
-    <a href="01-feed.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none;color:inherit">
-      <span style="font-size:20px">🏠</span><span style="font-size:10px;color:rgba(17,25,37,.6)">首页</span>
-    </a>
-    <a href="01-feed.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none">
-      <span style="font-size:20px">📰</span><span style="font-size:10px;color:rgba(17,25,37,.6)">今日虾条</span>
-    </a>
-    <a href="04-skill.html" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border-radius:10px;cursor:pointer;text-decoration:none">
-      <span style="font-size:20px">⚡</span><span style="font-size:10px;color:rgba(17,25,37,.6)">技能广场</span>
-    </a>
+<!-- Sidebar -->
+<aside class="sb">
+  <div class="sb-logo"><div class="sb-logo-ic">🦐</div></div>
+  <nav class="sb-nav">
+    <a class="si" href="01-feed.html"><span class="si-icon">🏠</span><span class="si-text">首页</span></a>
+    <a class="si" href="01-feed.html"><span class="si-icon">📰</span><span class="si-text">今日虾条</span></a>
+    <a class="si" href="04-skill.html"><span class="si-icon">⚡</span><span class="si-text">技能广场</span></a>
+    <a class="si active" href="#"><span class="si-icon">🦐</span><span class="si-text">我的虾</span></a>
   </nav>
-  <div style="padding-bottom:20px"><div style="width:40px;height:40px;border-radius:50%;background:rgba(17,25,37,.08);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer">👤</div></div>
+  <div class="sb-av"><button class="av-btn">👤</button></div>
 </aside>
 
-<!-- ── Main Content ── -->
-<div style="flex:1;display:flex;overflow:hidden">
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title">✨ 蒸馏工具 · IM内闭环</div>
+    <div class="tb-desc">任务完成→即时触发→自动填充→人补2处→发布，全程不离开对话</div>
+    <nav class="tb-links">
+      <a class="tb-link" href="04-skill.html">← Skill详情</a>
+      <a class="tb-link" href="06-growth.html">变强感知 →</a>
+    </nav>
+  </div>
 
-  <!-- Left IM Panel -->
-  <div class="im-panel">
-    <!-- Top bar -->
-    <div class="im-topbar">
-      <div class="im-avatar">🦐</div>
-      <div class="im-info">
-        <div class="im-name">工作助手 <span class="online-dot"></span> <span style="font-weight:400;font-size:12px;color:var(--t60)">在线</span></div>
-        <div class="im-status">AI 助理 · 随时待命</div>
-      </div>
-      <div class="im-menu">···</div>
-    </div>
+  <div class="panels">
 
-    <!-- Messages -->
-    <div class="im-messages">
-
-      <!-- Msg 1: User -->
-      <div class="msg-row user">
+    <!-- LEFT: IM -->
+    <div class="im-panel">
+      <div class="im-bar">
+        <div class="im-av">🦐</div>
         <div>
-          <div class="bubble user">帮我查下本周数据平台的DAU趋势</div>
-          <div class="msg-time">10:22</div>
+          <div style="font-size:14px;font-weight:700">工作助手</div>
+          <div class="im-online"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>在线</div>
         </div>
       </div>
+      <div class="im-msgs" id="im-msgs">
+        <!-- 历史对话 -->
+        <div class="msg user"><div class="bubble">帮我查下本周数据平台的DAU趋势</div><div class="msg-time">14:22</div></div>
+        <div class="msg bot">
+          <div class="bubble ok">📊 本周DAU趋势如下：
 
-      <!-- Msg 2: Bot with mini chart -->
-      <div class="msg-row bot">
-        <div>
-          <div class="bubble bot">
-            📊 本周DAU趋势如下：
-            <div class="mini-chart">
-              <div class="chart-bars">
-                <div class="chart-bar" style="height:28px"></div>
-                <div class="chart-bar" style="height:30px"></div>
-                <div class="chart-bar" style="height:26px"></div>
-                <div class="chart-bar" style="height:33px"></div>
-                <div class="chart-bar" style="height:36px"></div>
-              </div>
-              <div class="chart-labels">
-                <div class="chart-label">Mon</div>
-                <div class="chart-label">Tue</div>
-                <div class="chart-label">Wed</div>
-                <div class="chart-label">Thu</div>
-                <div class="chart-label">Fri</div>
-              </div>
-              <div class="chart-nums">12.4k · 13.1k · 11.8k · 14.2k · 15.6k</div>
-            </div>
-          </div>
-          <div class="msg-time">10:23</div>
+Mon   12.4k  ▄
+Tue   13.1k  ▅
+Wed   11.8k  ▃
+Thu   14.2k  ▆
+Fri   15.6k  ▇
+
+整体呈上升趋势，周四周五明显拉升</div>
+          <div class="msg-time">14:23</div>
         </div>
-      </div>
-
-      <!-- Msg 3: Bot tool tag -->
-      <div class="msg-row bot">
-        <div>
-          <div class="bubble bot">
-            [数据图表] 已生成 ✓
-            <div><span class="skill-tag">mt-data-tools v2.1</span></div>
-          </div>
-          <div class="msg-time">10:23</div>
+        <!-- 即时触发 -->
+        <div class="msg bot">
+          <div class="bubble trigger">搞定了！这个配方值得分享给社区 🎉<br><br>其他养虾人也在做DAU分析，你的方法可以帮到他们。</div>
+          <div class="msg-time">14:24</div>
         </div>
-      </div>
-
-      <!-- Msg 4: Trigger bubble (key message) -->
-      <div class="msg-row bot">
-        <div>
-          <div class="bubble trigger">
-            <div style="font-weight:600;font-size:14px">搞定了！要记录这个妙招吗？</div>
-            <div class="trigger-btns">
-              <button class="btn-distill" id="btnDistill">💡 记一下</button>
-              <button class="btn-share" id="btnShare">✍️ 分享心得</button>
-            </div>
-          </div>
-          <div class="msg-time">10:24</div>
+        <div class="trigger-btns">
+          <button class="btn-record" id="record-btn" onclick="startDistill()">💡 记一下</button>
+          <button class="btn-share" onclick="toast('✍️ 长文帖模板已打开')">✍️ 分享心得</button>
         </div>
-      </div>
-
-    </div><!-- /im-messages -->
-  </div><!-- /im-panel -->
-
-  <!-- Right Distill Panel -->
-  <div class="distill-panel">
-    <div class="panel-title">💡 蒸馏工具</div>
-    <div class="panel-sub">任务完成即蒸馏，不离开对话</div>
-
-    <!-- Step indicator -->
-    <div class="steps">
-      <div class="step">
-        <div class="step-circle active" id="sc1">1</div>
-        <div class="step-label">检测任务</div>
-      </div>
-      <div class="step-line"></div>
-      <div class="step">
-        <div class="step-circle idle" id="sc2">2</div>
-        <div class="step-label">自动填充</div>
-      </div>
-      <div class="step-line"></div>
-      <div class="step">
-        <div class="step-circle idle" id="sc3">3</div>
-        <div class="step-label">确认发布</div>
       </div>
     </div>
 
-    <!-- Card -->
-    <div class="card">
-
-      <!-- STATE 0: Detection -->
-      <div class="state active" id="state0">
-        <div class="card-title">系统检测到：</div>
-        <div class="detect-item">✅ 使用了 Skill（mt-data-tools v2.1）</div>
-        <div class="detect-item">✅ 任务已完成，有明确输出</div>
-        <div class="detect-item">✅ 属于「数据查询」类型 → 适合提炼配方卡片</div>
-        <div class="info-box">
-          <b>IM内确认方式：</b>
-          <span style="color:var(--t60)">通用方案（H5轻量页）→ 增强方案（气泡内嵌，Phase 2）</span>
-        </div>
-        <div class="info-note">点击左侧「💡 记一下」按钮，开始蒸馏流程</div>
+    <!-- RIGHT: Distill Flow -->
+    <div class="distill-panel">
+      <div style="margin-bottom:20px">
+        <div style="font-size:22px;font-weight:800;margin-bottom:4px">蒸馏工具</div>
+        <div style="font-size:13px;color:var(--t60)">点击左侧「💡 记一下」启动蒸馏流程</div>
       </div>
 
-      <!-- STATE 1: Auto-fill animation -->
-      <div class="state" id="state1">
-        <div class="card-title" style="color:var(--green)">⟳ 自动提炼中...</div>
-        <div id="fields">
-          <div class="field-row" id="f0"><span class="field-label">标题</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-          <div class="field-row" id="f1"><span class="field-label">Skill</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-          <div class="field-row" id="f2"><span class="field-label">核心指令</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-          <div class="field-row" id="f3"><span class="field-label">效果截图</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-          <div class="field-row" id="f4"><span class="field-label">场景标签</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-          <div class="field-row" id="f5"><span class="field-label">适用范围</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-          <div class="field-row" id="f6"><span class="field-label">版本信息</span><span class="field-value loading-text">⟳ 正在提炼...</span></div>
-        </div>
-        <div class="progress-text" id="progressText" style="display:none">✅ 已自动填好 5/7 项（80%）</div>
+      <!-- Step bar -->
+      <div class="step-bar">
+        <div class="stp"><div class="stp-num sn-cur" id="sn0">·</div><span class="stp-lbl cur" id="sl0">检测任务</span></div>
+        <span class="stp-arrow">→</span>
+        <div class="stp"><div class="stp-num sn-idle" id="sn1">1</div><span class="stp-lbl" id="sl1">自动填充</span></div>
+        <span class="stp-arrow">→</span>
+        <div class="stp"><div class="stp-num sn-idle" id="sn2">2</div><span class="stp-lbl" id="sl2">人工确认</span></div>
+        <span class="stp-arrow">→</span>
+        <div class="stp"><div class="stp-num sn-idle" id="sn3">3</div><span class="stp-lbl" id="sl3">预检发布</span></div>
       </div>
 
-      <!-- STATE 2: User fills in -->
-      <div class="state" id="state2">
-        <div class="card-title">✍️ 你来补（必填）</div>
-        <label class="form-label">一句话效果总结：</label>
-        <textarea placeholder="以前要手写SQL+手动作图30分钟，现在虾1分钟搞定…"></textarea>
+      <!-- Step 0: Detection -->
+      <div class="flow-card show" id="fc0">
+        <div class="fc-title">🔍 系统检测</div>
+        <div class="detect-row"><span class="detect-icon">✅</span><span>使用了 Skill（mt-data-tools v2.1）</span></div>
+        <div class="detect-row"><span class="detect-icon">✅</span><span>任务已完成，有明确数据输出</span></div>
+        <div class="detect-row"><span class="detect-icon">✅</span><span>属于「数据查询」类型 → <strong>适合提炼配方卡片</strong></span></div>
+        <div style="margin-top:16px;padding:12px 14px;background:var(--bg);border-radius:var(--rs);font-size:13px;color:var(--t60);line-height:1.7">
+          <b>触发时机</b>（v3.1 设计）：<br>
+          ① Skill回调触发（高可靠，Phase 1）<br>
+          ② 用户主动说「记一下」（中可靠，Phase 1）<br>
+          ③ 产出物检测（低可靠，Phase 2）
+        </div>
+        <div class="alt-box">
+          <div class="alt-toggle" onclick="toggleAlt()">▶ 如果是非结构化任务（写邮件/创意发散），改用「✍️ 分享心得」</div>
+          <div class="alt-content" id="alt-content">
+            <div style="font-size:13px;color:var(--t75);margin-bottom:10px">长文帖模板（5-10分钟完成）：</div>
+            <div style="font-size:12px;color:var(--t60);line-height:2;background:var(--bg);padding:10px;border-radius:6px">
+              【背景】我让虾帮我___<br>
+              【虾做了什么】具体描述<br>
+              【结果】最终输出是什么<br>
+              【心得】什么情况下适合这样用
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: Autofill -->
+      <div class="flow-card" id="fc1">
+        <div class="fc-title">⚡ Step 1 · 自动填充 <span style="font-size:12px;font-weight:400;color:var(--t40)">系统正在提炼…</span></div>
+        <div id="fill-content">
+          <div class="fill-row"><div class="fill-label">标题</div><div class="fill-val loading" id="fv-title"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>
+          <div class="fill-row"><div class="fill-label">Skill</div><div class="fill-val loading" id="fv-skill"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>
+          <div class="fill-row"><div class="fill-label">核心指令</div><div class="fill-val loading" id="fv-prompt"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>
+          <div class="fill-row"><div class="fill-label">效果截图</div><div class="fill-val loading" id="fv-effect"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>
+          <div class="fill-row"><div class="fill-label">场景标签</div><div class="fill-val loading" id="fv-scene"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div></div>
+        </div>
+        <div class="fill-summary" id="fill-summary">✅ 已自动填好 5/7 项（80%）— 只需你补充 2 处</div>
+      </div>
+
+      <!-- Step 2: Confirm -->
+      <div class="flow-card" id="fc2">
+        <div class="fc-title">✍️ Step 2 · 你来补充（2处）</div>
         <div class="form-group">
-          <label class="form-label warn">⚠️ 踩坑提醒（选填）：</label>
-          <textarea placeholder="需要先配置数据库连接权限…"></textarea>
+          <label class="form-label">一句话效果总结 <span class="req">*</span></label>
+          <input class="form-input" id="effect-input" type="text" placeholder="以前手写SQL+手动作图30分钟，现在虾1分钟搞定，直接输出图表…">
         </div>
-        <div class="action-btns">
-          <button class="btn-outline">预览配方</button>
-          <button class="btn-primary" id="btnPublish">发布 →</button>
+        <div class="form-group">
+          <label class="form-label">踩坑提醒（选填）</label>
+          <input class="form-input" type="text" placeholder="需要先配置数据库连接，在设置→权限管理里开启…">
         </div>
-      </div>
-
-      <!-- STATE 3: Pre-check -->
-      <div class="state" id="state3">
-        <div class="card-title">🔍 正在预检...</div>
-        <div class="check-item" id="ck0">✅ mt-data-tools 数据查询成功</div>
-        <div class="check-item" id="ck1">✅ 结果与原配方一致</div>
-        <div class="success-rate" id="successRate">成功率：100%</div>
-        <button class="btn-publish" id="btnPublishCommunity">发布到社区 🚀</button>
-      </div>
-
-      <!-- STATE 4: Success -->
-      <div class="state" id="state4">
-        <div class="success-card">
-          <div class="success-emoji">🎉</div>
-          <div class="success-title">配方已发布！</div>
-          <div class="success-desc">「查本周DAU趋势」已添加到 📊 数据分析 场景</div>
-          <div class="success-divider"></div>
-          <div class="success-note">IM里会收到：当有人试用成功时，虾会通知你</div>
+        <div style="font-size:12px;color:var(--t40);margin-bottom:12px">预计耗时 &lt; 2 分钟 · 总字数 ≤ 300字</div>
+        <div class="form-actions">
+          <button class="btn-ghost" onclick="toast('预览配方卡片')">👁 预览</button>
+          <button class="btn-primary" id="publish-btn" onclick="startPrecheck()">发布 →</button>
         </div>
       </div>
 
-    </div><!-- /card -->
-
-    <!-- Collapsible section -->
-    <div class="collapsible" id="collapsible">
-      <div class="collapsible-header" id="collapsibleHeader">
-        <span class="collapsible-arrow" id="collapsibleArrow">▶</span>
-        如果是非结构化任务（写邮件/创意发散）
-      </div>
-      <div class="collapsible-body" id="collapsibleBody">
-        <div class="collapsible-inner">
-          <div style="font-weight:600;margin-bottom:10px">✍️ 分享心得 · 长文帖模板</div>
-          <div class="tpl-row"><span class="tpl-key">标题</span><span>你的心得标题…</span></div>
-          <div class="tpl-row"><span class="tpl-key">背景</span><span>遇到了什么问题…</span></div>
-          <div class="tpl-row"><span class="tpl-key">过程</span><span>怎么用虾解决的…</span></div>
-          <div class="tpl-row"><span class="tpl-key">收获</span><span>最终效果如何…</span></div>
-          <div class="tpl-row" style="border:none"><span class="tpl-key">提示</span><span>给其他人的建议…</span></div>
+      <!-- Step 3: Precheck -->
+      <div class="flow-card" id="fc3">
+        <div class="fc-title">🔍 Step 3 · 预检</div>
+        <div class="ck-row"><span class="ck-icon" id="ck1">⟳</span><span class="ck-name">mt-data-tools 数据查询</span><span class="ck-status" id="ck1s">执行中…</span></div>
+        <div class="ck-row"><span class="ck-icon" id="ck2">⟳</span><span class="ck-name">结果与原配方一致性校验</span><span class="ck-status" id="ck2s">等待…</span></div>
+        <div class="ck-row"><span class="ck-icon" id="ck3">⟳</span><span class="ck-name">Skill版本有效性确认</span><span class="ck-status" id="ck3s">等待…</span></div>
+        <div class="rate-row" id="rate-row">
+          <div class="rate-num">100%</div>
+          <div style="flex:1;font-size:14px;color:var(--t75);padding-left:8px">预检通过！配方可复现</div>
+          <button class="btn-primary" onclick="publishDone()">🚀 发布到社区</button>
         </div>
       </div>
+
+      <!-- Step 4: Done -->
+      <div class="flow-card" id="fc4">
+        <div class="done-card">
+          <div class="done-icon">🎉</div>
+          <div class="done-title">配方已发布！</div>
+          <div class="done-sub">「查本周DAU趋势」已添加到 📊 数据分析 场景</div>
+          <div class="next-items">
+            <div class="next-item"><span>→</span><span>其他养虾人在场景页可以看到你的配方</span></div>
+            <div class="next-item"><span>→</span><span>有人「让虾试试」成功后，你的虾会在这里通知你</span></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <a href="06-growth.html" style="text-decoration:none"><button class="btn-primary">📈 查看变强感知 →</button></a>
+            <button class="btn-ghost" onclick="resetFlow()">再试一次</button>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
+</div>
 
-  </div><!-- /distill-panel -->
-</div><!-- /main -->
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast-el"></div>
 
 <script>
-// ── Helpers ──
-const $ = id => document.getElementById(id);
+// ── State ──
+let currentStep = 0;
 
-function showToast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
+function startDistill() {
+  const btn = document.getElementById('record-btn');
+  btn.disabled = true;
+  btn.textContent = '提炼中…';
 
-function setStep(n, state) {
-  // state: 'done' | 'active' | 'idle'
-  $('sc' + n).className = 'step-circle ' + state;
-}
+  // Show step 1
+  showFlow(1);
+  setStep(1);
 
-// ── State machine ──
-let currentState = 0;
+  // Auto-fill animation
+  const fills = [
+    {id:'fv-title',  delay:500,  badge:true, html:'查本周DAU趋势'},
+    {id:'fv-skill',  delay:1000, badge:true, html:'<span style="background:#E6F0FF;color:#0E65E8;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">mt-data-tools v2.1</span>'},
+    {id:'fv-prompt', delay:1600, badge:true, html:'「查询本周每日DAU数据，绘制趋势折线图，标注最高最低点」'},
+    {id:'fv-effect', delay:2200, badge:true, html:'<span style="color:var(--t40);font-size:12px">[数据图表截图已自动截取]</span>'},
+    {id:'fv-scene',  delay:2800, badge:true, html:'<span style="background:rgba(33,180,67,.1);color:var(--green);padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700">📊 数据分析</span>'},
+  ];
 
-function goState(n) {
-  $('state' + currentState).classList.remove('active');
-  $('state' + n).classList.add('active');
-  currentState = n;
-}
-
-// Field data: null = still loading (stays as spinner)
-const fieldData = [
-  '「查本周DAU趋势」',
-  'mt-data-tools v2.1',
-  '「查询本周DAU趋势，按天绘制折线图，标注周末」',
-  '[已自动截取图表截图 📸]',
-  '📊 数据分析',
-  null, // loading
-  null, // loading
-];
-
-function animateFields() {
-  fieldData.forEach((data, i) => {
-    // Reveal each row with staggered delay
+  fills.forEach(({id, delay, badge, html}) => {
     setTimeout(() => {
-      const row = $('f' + i);
-      row.classList.add('visible');
-      if (data !== null) {
-        const valEl = row.querySelector('.field-value');
-        valEl.innerHTML = '<span class="auto-badge">自动</span>' + data;
-        valEl.classList.remove('loading-text');
-      }
-      // After last field, show progress then advance to state 2
-      if (i === fieldData.length - 1) {
-        setTimeout(() => {
-          $('progressText').style.display = 'block';
-          setTimeout(() => {
-            setStep(2, 'done');
-            setStep(3, 'active');
-            goState(2);
-          }, 700);
-        }, 300);
-      }
-    }, 300 + i * 400);
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.className = 'fill-val done';
+      el.innerHTML = (badge ? '<span class="auto-badge">自动</span>' : '') + '<span>' + html + '</span>';
+    }, delay);
+  });
+
+  setTimeout(() => {
+    document.getElementById('fill-summary').style.display = 'block';
+    setTimeout(() => { showFlow(2); setStep(2); }, 800);
+  }, 3400);
+}
+
+function startPrecheck() {
+  const val = document.getElementById('effect-input').value.trim();
+  if (!val) { toast('⚠️ 请填写一句话效果总结'); document.getElementById('effect-input').focus(); return; }
+  document.getElementById('publish-btn').textContent = '预检中…';
+  document.getElementById('publish-btn').disabled = true;
+  showFlow(3); setStep(3);
+
+  const checks = [
+    {ck:'ck1', ks:'ck1s', delay:900,  icon:'✅', status:'数据查询成功', statusColor:'var(--green)'},
+    {ck:'ck2', ks:'ck2s', delay:1900, icon:'✅', status:'结果与原配方一致', statusColor:'var(--green)'},
+    {ck:'ck3', ks:'ck3s', delay:2700, icon:'✅', status:'v2.1 有效', statusColor:'var(--green)'},
+  ];
+  checks.forEach(({ck,ks,delay,icon,status,statusColor}) => {
+    setTimeout(() => {
+      document.getElementById(ck).textContent = icon;
+      const s = document.getElementById(ks);
+      s.textContent = status; s.style.color = statusColor;
+      if (ck === 'ck1') { document.getElementById('ck2').textContent = '⟳'; document.getElementById('ck2s').textContent = '校验中…'; }
+    }, delay);
+  });
+  setTimeout(() => { document.getElementById('rate-row').classList.add('show'); }, 3200);
+}
+
+function publishDone() {
+  setTimeout(() => { showFlow(4); setStep(4); }, 600);
+}
+
+function showFlow(n) {
+  for (let i=0;i<=4;i++) {
+    const el = document.getElementById('fc'+i);
+    if (el) el.classList.toggle('show', i===n);
+  }
+}
+
+function setStep(n) {
+  const labels = ['检测任务','自动填充','人工确认','预检发布'];
+  for (let i=0;i<=3;i++) {
+    const num = document.getElementById('sn'+i);
+    const lbl = document.getElementById('sl'+i);
+    if (!num) continue;
+    if (i<n) { num.className='stp-num sn-done'; num.textContent='✓'; lbl.className='stp-lbl done'; }
+    else if (i===n) { num.className='stp-num sn-cur'; num.textContent=i===0?'·':i; lbl.className='stp-lbl cur'; }
+    else { num.className='stp-num sn-idle'; num.textContent=i; lbl.className='stp-lbl'; }
+  }
+}
+
+function toggleAlt() {
+  document.getElementById('alt-content').classList.toggle('show');
+}
+
+function resetFlow() {
+  showFlow(0); setStep(0);
+  document.getElementById('record-btn').disabled = false;
+  document.getElementById('record-btn').textContent = '💡 记一下';
+  document.getElementById('fill-summary').style.display = 'none';
+  document.getElementById('effect-input').value = '';
+  document.getElementById('rate-row').classList.remove('show');
+  document.getElementById('publish-btn').textContent = '发布 →';
+  document.getElementById('publish-btn').disabled = false;
+  ['ck1','ck2','ck3'].forEach(id => {
+    document.getElementById(id).textContent = '⟳';
+    document.getElementById(id+'s').textContent = id==='ck1'?'执行中…':'等待…';
+    document.getElementById(id+'s').style.color = '';
+  });
+  const fills = ['fv-title','fv-skill','fv-prompt','fv-effect','fv-scene'];
+  fills.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className='fill-val loading'; el.innerHTML='<span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>'; }
   });
 }
 
-// ── Button: 💡 记一下 ──
-$('btnDistill').addEventListener('click', () => {
-  if (currentState !== 0) return;
-  setStep(1, 'done');
-  setStep(2, 'active');
-  goState(1);
-  animateFields();
-});
-
-// ── Button: 发布 ──
-$('btnPublish').addEventListener('click', () => {
-  goState(3);
-  // Animate check items
-  setTimeout(() => $('ck0').classList.add('visible'), 400);
-  setTimeout(() => $('ck1').classList.add('visible'), 1000);
-  setTimeout(() => $('successRate').classList.add('visible'), 1600);
-  setTimeout(() => $('btnPublishCommunity').classList.add('visible'), 1800);
-});
-
-// ── Button: 发布到社区 ──
-$('btnPublishCommunity').addEventListener('click', () => {
-  goState(4);
-});
-
-// ── Button: ✍️ 分享心得 ──
-$('btnShare').addEventListener('click', () => {
-  showToast('分享心得功能即将上线');
-  // Highlight and expand the collapsible
-  const c = $('collapsible');
-  c.style.transition = 'box-shadow .3s';
-  c.style.boxShadow = '0 0 0 2px var(--green)';
-  c.style.borderRadius = '8px';
-  setTimeout(() => { c.style.boxShadow = 'none'; }, 1800);
-  if (!$('collapsibleBody').classList.contains('open')) {
-    $('collapsibleBody').classList.add('open');
-    $('collapsibleArrow').classList.add('open');
-  }
-  setTimeout(() => c.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
-});
-
-// ── Collapsible toggle ──
-$('collapsibleHeader').addEventListener('click', () => {
-  $('collapsibleBody').classList.toggle('open');
-  $('collapsibleArrow').classList.toggle('open');
-});
+let tt;
+function toast(msg) {
+  const t = document.getElementById('toast-el');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3000);
+}
 </script>
 </body>
 </html>
